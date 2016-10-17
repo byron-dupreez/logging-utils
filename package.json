@@ -1,0 +1,18 @@
+{
+  "name": "logging-utils",
+  "description": "Utilities for configuring simple log level based logging functionality on an object",
+  "version": "1.0.0",
+  "author": "Byron du Preez",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=4.3.2"
+  },
+  "main": "logging-utils.js",
+  "scripts": {
+    "test": "tape ./test/*.test.js"
+  },
+  "repository": "https://github.com/byron-dupreez/logging-utils",
+  "dependencies": {
+    "core-functions": "^1.0.0"
+  }
+}

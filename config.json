@@ -1,0 +1,5 @@
+{
+  "defaultLogLevel": "info",
+  "defaultUseLevelPrefixes": true,
+  "defaultUseConsoleTrace": false
+}
