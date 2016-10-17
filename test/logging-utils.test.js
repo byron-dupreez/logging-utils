@@ -15,10 +15,8 @@ const WARN = logging.WARN;
 const INFO = logging.INFO;
 const DEBUG = logging.DEBUG;
 const TRACE = logging.TRACE;
-//const defaultLogLevel = logging.defaultLogLevel;
 // Logging utils functions
 const isLoggingConfigured = logging.isLoggingConfigured;
-const configureLoggingOn = logging.configureLoggingOn;
 const configureLogging = logging.configureLogging;
 
 function testLogger(logLevel, useConsole, t) {
@@ -78,16 +76,17 @@ function logOneOfEach(log, logLevel) {
 test('isLoggingConfigured', t => {
   t.equal(isLoggingConfigured({}), false, 'logging must not be configured on {}');
 
-  const log = configureLogging(ERROR);
+  const log = configureLogging({}, ERROR, true, undefined, false, true);
+
   t.equal(isLoggingConfigured(log), true, 'logging must be configured');
   t.end();
 });
 
 // =====================================================================================================================
-// Test configureLoggingOn with test logger to validate methods
+// Test configureLogging on existing object with test logger to validate methods
 // =====================================================================================================================
 
-test('configureLoggingOn with TRACE level with test logger & prefixes', t => {
+test('configureLogging on existing object with TRACE level with test logger & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -95,7 +94,7 @@ test('configureLoggingOn with TRACE level with test logger & prefixes', t => {
   const logger = testLogger(logLevel, useConsole, t);
 
   const context = { abc: 123 };
-  configureLoggingOn(context, logLevel, useLevelPrefixes, logger, useConsole, false);
+  configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.ok(context.warnEnabled, 'warn must be enabled');
@@ -108,7 +107,7 @@ test('configureLoggingOn with TRACE level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLoggingOn with DEBUG level with test logger & prefixes', t => {
+test('configureLogging on existing object with DEBUG level with test logger & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -116,7 +115,7 @@ test('configureLoggingOn with DEBUG level with test logger & prefixes', t => {
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
 
   const context = { abc: 123 };
-  configureLoggingOn(context, logLevel, useLevelPrefixes, logger, useConsole, false);
+  configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.ok(context.warnEnabled, 'warn must be enabled');
@@ -129,7 +128,7 @@ test('configureLoggingOn with DEBUG level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLoggingOn with INFO level with test logger & prefixes', t => {
+test('configureLogging on existing object with INFO level with test logger & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -137,7 +136,7 @@ test('configureLoggingOn with INFO level with test logger & prefixes', t => {
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
 
   const context = { abc: 123 };
-  configureLoggingOn(context, logLevel, useLevelPrefixes, logger, useConsole, false);
+  configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.ok(context.warnEnabled, 'warn must be enabled');
@@ -150,7 +149,7 @@ test('configureLoggingOn with INFO level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLoggingOn with WARN level with test logger & prefixes', t => {
+test('configureLogging on existing object with WARN level with test logger & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -158,7 +157,7 @@ test('configureLoggingOn with WARN level with test logger & prefixes', t => {
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
 
   const context = { abc: 123 };
-  configureLoggingOn(context, logLevel, useLevelPrefixes, logger, useConsole, false);
+  configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.ok(context.warnEnabled, 'warn must be enabled');
@@ -171,7 +170,7 @@ test('configureLoggingOn with WARN level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLoggingOn with ERROR level with test logger & prefixes', t => {
+test('configureLogging on existing object with ERROR level with test logger & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -179,7 +178,7 @@ test('configureLoggingOn with ERROR level with test logger & prefixes', t => {
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
 
   const context = { abc: 123 };
-  configureLoggingOn(context, logLevel, useLevelPrefixes, logger, useConsole, false);
+  configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.notOk(context.warnEnabled, 'warn must not be enabled');
@@ -193,16 +192,16 @@ test('configureLoggingOn with ERROR level with test logger & prefixes', t => {
 });
 
 // =====================================================================================================================
-// Test configureLogging with test logger to validate methods
+// Test configureLogging on new object with test logger to validate methods
 // =====================================================================================================================
 
-test('configureLogging with TRACE level with test logger & prefixes', t => {
+test('configureLogging on new object with TRACE level with test logger & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = false;
   const useConsole = false;
 
   const logger = testLogger(logLevel, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsole);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -214,13 +213,13 @@ test('configureLogging with TRACE level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with DEBUG level with test logger & prefixes', t => {
+test('configureLogging on new object with DEBUG level with test logger & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = false;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsole);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -232,13 +231,13 @@ test('configureLogging with DEBUG level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with INFO level with test logger & prefixes', t => {
+test('configureLogging on new object with INFO level with test logger & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = false;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsole);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -250,13 +249,13 @@ test('configureLogging with INFO level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with WARN level with test logger & prefixes', t => {
+test('configureLogging on new object with WARN level with test logger & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = false;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsole);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -268,13 +267,13 @@ test('configureLogging with WARN level with test logger & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with ERROR level with test logger & prefixes', t => {
+test('configureLogging on new object with ERROR level with test logger & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = false;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsole);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
   t.notOk(log.warnEnabled, 'warn must not be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -287,17 +286,17 @@ test('configureLogging with ERROR level with test logger & prefixes', t => {
 });
 
 // =====================================================================================================================
-// Test configureLogging with console (i.e. test real usage for Lambdas) and useLevelPrefixes true
+// Test configureLogging on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes true
 // =====================================================================================================================
 const useConsoleTrace = false;
 
-test('configureLogging with TRACE level with console & prefixes', t => {
+test('configureLogging on new object with TRACE level with console & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = true;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -309,13 +308,13 @@ test('configureLogging with TRACE level with console & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with DEBUG level with console & prefixes', t => {
+test('configureLogging on new object with DEBUG level with console & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -327,13 +326,13 @@ test('configureLogging with DEBUG level with console & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with INFO level with console & prefixes', t => {
+test('configureLogging on new object with INFO level with console & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -345,13 +344,13 @@ test('configureLogging with INFO level with console & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with WARN level with console & prefixes', t => {
+test('configureLogging on new object with WARN level with console & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -363,13 +362,13 @@ test('configureLogging with WARN level with console & prefixes', t => {
   t.end();
 });
 
-test('configureLogging with ERROR level with console & prefixes', t => {
+test('configureLogging on new object with ERROR level with console & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.notOk(log.warnEnabled, 'warn must not be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -384,16 +383,16 @@ test('configureLogging with ERROR level with console & prefixes', t => {
 
 
 // =====================================================================================================================
-// Test configureLogging with console (i.e. test real usage for Lambdas) and useLevelPrefixes false
+// Test configureLogging on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes false
 // =====================================================================================================================
 
-test('configureLogging with TRACE level with console & no prefixes', t => {
+test('configureLogging on new object with TRACE level with console & no prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = false;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -405,13 +404,13 @@ test('configureLogging with TRACE level with console & no prefixes', t => {
   t.end();
 });
 
-test('configureLogging with DEBUG level with console & no prefixes', t => {
+test('configureLogging on new object with DEBUG level with console & no prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = false;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -423,13 +422,13 @@ test('configureLogging with DEBUG level with console & no prefixes', t => {
   t.end();
 });
 
-test('configureLogging with INFO level with console & no prefixes', t => {
+test('configureLogging on new object with INFO level with console & no prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = false;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.ok(log.infoEnabled, 'info must be enabled');
@@ -441,13 +440,13 @@ test('configureLogging with INFO level with console & no prefixes', t => {
   t.end();
 });
 
-test('configureLogging with WARN level with console & no prefixes', t => {
+test('configureLogging on new object with WARN level with console & no prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = false;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.ok(log.warnEnabled, 'warn must be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -459,13 +458,13 @@ test('configureLogging with WARN level with console & no prefixes', t => {
   t.end();
 });
 
-test('configureLogging with ERROR level with console & no prefixes', t => {
+test('configureLogging on new object with ERROR level with console & no prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = false;
   const useConsole = true;
 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
-  const log = configureLogging(logLevel, useLevelPrefixes, logger, useConsoleTrace);
+  const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
   t.notOk(log.warnEnabled, 'warn must not be enabled');
   t.notOk(log.infoEnabled, 'info must not be enabled');
@@ -478,14 +477,14 @@ test('configureLogging with ERROR level with console & no prefixes', t => {
 });
 
 // =====================================================================================================================
-// Ensure that configureLoggingOn does NOT override previously configured logging if not forced
+// Ensure that configureLogging on existing object does NOT override previously configured logging if not forced
 // =====================================================================================================================
 
-test('configureLoggingOn MUST NOT override previously configured logging if not forced', t => {
+test('configureLogging on existing object MUST NOT override previously configured logging if not forced', t => {
   const useLevelPrefixes = true;
   const useConsole = false;
 
-  const context = configureLogging(TRACE, useLevelPrefixes, testLogger(TRACE, useConsole, t), useConsoleTrace);
+  const context = configureLogging({}, TRACE, useLevelPrefixes, testLogger(TRACE, useConsole, t), useConsoleTrace, true);
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
@@ -495,7 +494,7 @@ test('configureLoggingOn MUST NOT override previously configured logging if not 
   t.ok(context.traceEnabled, 'trace must be enabled');
 
   // Now attempt to override
-  configureLoggingOn(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, false);
+  configureLogging(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, TRACE, 'logLevel must still be TRACE');
@@ -510,14 +509,15 @@ test('configureLoggingOn MUST NOT override previously configured logging if not 
 });
 
 // =====================================================================================================================
-// Ensure that configureLoggingOn does override previously configured logging if forced
+// Ensure that configureLogging on existing object does override previously configured logging if forced
 // =====================================================================================================================
 
-test('configureLoggingOn MUST override previously configured logging if forced', t => {
+test('configureLogging on existing object MUST override previously configured logging if forced', t => {
   const useLevelPrefixes = true;
   const useConsole = false;
 
-  const context = configureLogging(TRACE, useLevelPrefixes, testLogger(TRACE, useConsole, t), useConsoleTrace);
+  // First pre-configure the context with TRACE level logging
+  const context = configureLogging({}, TRACE, useLevelPrefixes, testLogger(TRACE, useConsole, t), useConsoleTrace, true);
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
@@ -526,8 +526,8 @@ test('configureLoggingOn MUST override previously configured logging if forced',
   t.ok(context.debugEnabled, 'debug must be enabled');
   t.ok(context.traceEnabled, 'trace must be enabled');
 
-  // Now attempt to override
-  configureLoggingOn(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, true);
+  // Now attempt to override with ERROR level logging (by using forceConfiguration option)
+  configureLogging(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, true);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, ERROR, 'logLevel must now be ERROR');
