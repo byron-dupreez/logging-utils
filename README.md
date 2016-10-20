@@ -1,4 +1,4 @@
-# logging-utils v1.0.0
+# logging-utils v1.0.1
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -114,3 +114,7 @@ if (context.traceEnabled) context.trace('Trace message 2');
 This module's unit tests were developed with and must be run with [tape](https://www.npmjs.com/package/tape). The unit tests have been tested on [Node.js v4.3.2](https://nodejs.org/en/blog/release/v4.3.2/).  
 
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
+
+## Changes
+### 1.0.1
+- Simply set core-functions dependency to 1.1.1
