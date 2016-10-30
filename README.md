@@ -1,4 +1,4 @@
-# logging-utils v1.0.1
+# logging-utils v1.0.2
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -32,6 +32,7 @@ const logging = require('logging-utils');
 // Logging configuration functions
 const configureLogging = logging.configureLogging;
 const isLoggingConfigured = logging.isLoggingConfigured;
+const configureDefaultLogging = logging.configureDefaultLogging;
 
 // Log level constants
 const ERROR = logging.ERROR;
@@ -65,6 +66,10 @@ configureLogging(context, DEBUG, false, console, false, true);
 * To configure simple default logging on a new object
 ```js
 const log = configureLogging({});
+```
+* To configure default logging on an existing object
+```js
+configureDefaultLogging(context);
 ```
 
 ### 2. Log messages
@@ -118,3 +123,7 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 ## Changes
 ### 1.0.1
 - Simply set core-functions dependency to 1.1.1
+### 1.0.2
+- Added an explicit `configureDefaultLogging` function for clarity.
+- Minor JSDoc updates
+- Updated core-functions dependency to 1.2.0
