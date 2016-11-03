@@ -1,4 +1,4 @@
-# logging-utils v1.0.2
+# logging-utils v1.0.3
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -123,7 +123,12 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 ## Changes
 ### 1.0.1
 - Simply set core-functions dependency to 1.1.1
+
 ### 1.0.2
 - Added an explicit `configureDefaultLogging` function for clarity.
 - Minor JSDoc updates
 - Updated core-functions dependency to 1.2.0
+
+### 1.0.3
+- Removed dependency on and replaced usage of `core-functions/functions` functions with standard JS functionality
+- Updated `core-functions` dependency to version 2.0.0

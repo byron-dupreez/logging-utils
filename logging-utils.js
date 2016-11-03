@@ -19,9 +19,7 @@ const strings = require('core-functions/strings');
 const isBlank = strings.isBlank;
 const isString = strings.isString;
 
-const functions = require('core-functions/functions');
-const isFunction = functions.isFunction;
-const noop = functions.noop;
+function noop() {}
 
 const booleans = require('core-functions/booleans');
 const isBoolean = booleans.isBoolean;
@@ -77,8 +75,8 @@ const defaultUseConsoleTrace = isBoolean(config.defaultUseConsoleTrace) ? config
  */
 function isLoggingConfigured(target) {
   return isBoolean(target.warnEnabled) && isBoolean(target.infoEnabled) && isBoolean(target.debugEnabled)
-    && isBoolean(target.traceEnabled) && isFunction(target.error) && isFunction(target.warn)
-    && isFunction(target.info) && isFunction(target.debug) && isFunction(target.trace);
+    && isBoolean(target.traceEnabled) && typeof target.error === 'function' && typeof target.warn === 'function'
+    && typeof target.info === 'function' && typeof target.debug === 'function' && typeof target.trace === 'function';
 }
 
 /**
@@ -254,8 +252,8 @@ function toValidLogLevelOrDefault(logLevel, defaultLogLevel) {
  * @returns {boolean} true if console or valid; false otherwise
  */
 function isValidLogger(logger) {
-  return logger === console || (logger && isFunction(logger.error) && isFunction(logger.warn)
-    && isFunction(logger.info) && isFunction(logger.debug) && isFunction(logger.trace));
+  return logger === console || (logger && typeof logger.error === 'function' && typeof logger.warn === 'function'
+    && typeof logger.info === 'function' && typeof logger.debug === 'function' && typeof logger.trace === 'function');
 }
 
 /**
