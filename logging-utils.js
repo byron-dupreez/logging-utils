@@ -19,7 +19,8 @@ const strings = require('core-functions/strings');
 const isBlank = strings.isBlank;
 const isString = strings.isString;
 
-function noop() {}
+function noop() {
+}
 
 const booleans = require('core-functions/booleans');
 const isBoolean = booleans.isBoolean;
@@ -40,6 +41,8 @@ module.exports = {
   configureLogging: configureLogging,
   /** Configures default logging on a target object. */
   configureDefaultLogging: configureDefaultLogging,
+  /** Configure logging on a target object from a given config object */
+  configureLoggingFromConfig: configureLoggingFromConfig,
 
   // Constants for Log Levels
   /** Constant for the ERROR log level */
@@ -51,22 +54,20 @@ module.exports = {
   /** Constant for the DEBUG log level */
   DEBUG: DEBUG,
   /** Constant for the TRACE log level */
-  TRACE: TRACE
-
-  //defaultLogLevel: defaultLogLevel
+  TRACE: TRACE,
 };
 
 // Load local configuration
 const config = require('./config.json');
 
 const defaultLogLevel = toValidLogLevelOrDefault(config.defaultLogLevel, INFO);
-//console.log(`Default logging level set to (${defaultLogLevel})`);
+module.exports.defaultLogLevel = defaultLogLevel;
 
 const defaultUseLevelPrefixes = isBoolean(config.defaultUseLevelPrefixes) ? config.defaultUseLevelPrefixes : true;
-//console.log(`Default use level prefixes set to (${defaultUseLevelPrefixes})`);
+module.exports.defaultUseLevelPrefixes = defaultUseLevelPrefixes;
 
 const defaultUseConsoleTrace = isBoolean(config.defaultUseConsoleTrace) ? config.defaultUseConsoleTrace : false;
-//console.log(`Default use console.trace set to (${defaultUseConsoleTrace})`);
+module.exports.defaultUseConsoleTrace = defaultUseConsoleTrace;
 
 /**
  * Returns true, if the given target already has logging functionality configured on it; otherwise returns false.
@@ -171,9 +172,7 @@ function configureLogging(target, logLevel, useLevelPrefixes, underlyingLogger, 
   // Finalise the log level to be used
   const logLevelFinal = finaliseLogLevel(target, logLevel, forceConfiguration);
 
-  console.log(`Log level set to (${logLevelFinal})`);
-  console.log(`Use level prefixes set to (${useLevelPrefixesFinal})`);
-  console.log(`Use console.trace set to (${useConsoleTraceFinal})`);
+  console.log(`Logging: Using log level ${logLevelFinal.toUpperCase()}; ${!useLevelPrefixesFinal ? 'NOT using' : 'Using'} level prefixes; ${!useConsoleTraceFinal ? 'NOT using' : 'Using'} console.trace`);
 
   // Use log level to determine which levels are enabled
   const traceEnabled = logLevelFinal === TRACE;
@@ -215,10 +214,41 @@ function configureLogging(target, logLevel, useLevelPrefixes, underlyingLogger, 
  * - Use console trace is set to target.useConsoleTrace (if any) or config.useConsoleTrace (if any) or false.
  *
  * @param {Object} target - the target object to which to add default logging functionality
+ * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
+ * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the default logging
+ * functionality, which will override any previously configured logging functionality on the target object
  * @return {Object} the updated target object
  */
-function configureDefaultLogging(target) {
-  return configureLogging(target, undefined, undefined, undefined, undefined, false);
+function configureDefaultLogging(target, underlyingLogger, forceConfiguration) {
+  return configureLogging(target, defaultLogLevel, defaultUseLevelPrefixes, underlyingLogger, defaultUseConsoleTrace,
+    forceConfiguration);
+}
+
+/**
+ * A convenience function to configure logging (see {@linkcode configureLogging}) on the target object from the given
+ * config object that ideally contains logLevel, useLevelPrefixes and useConsoleTrace properties with which to
+ * configure logging. If the given config is undefined or not an object, then default logging will be configured with
+ * the given underlyingLogger and forceConfiguration.
+ *
+ * @param {Object} target the target object to which to add the logging functionality
+ * @param {Object} config - a config object
+ * @param {string|undefined} [config.logging.logLevel] - the optional level of logging to configure
+ * @param {boolean|undefined} [config.logging.useLevelPrefixes] - optional whether or not to prepend level prefixes to logged messages
+ * @param {boolean|undefined} [config.logging.useConsoleTrace] - optional whether or not to use console.trace or console.log for trace level logging
+ * @param {string|undefined} [config.logLevel] - the optional level of logging to configure
+ * @param {boolean|undefined} [config.useLevelPrefixes] - optional whether or not to prepend level prefixes to logged messages
+ * @param {boolean|undefined} [config.useConsoleTrace] - optional whether or not to use console.trace or console.log for trace level logging
+ * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
+ * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
+ * which will override any previously configured logging functionality on the target object
+ * @return {Object} the updated target object
+ */
+function configureLoggingFromConfig(target, config, underlyingLogger, forceConfiguration) {
+  return config && typeof config === 'object' ?
+    config.logging && typeof config.logging === 'object' ?
+      configureLoggingFromConfig(target, config.logging, underlyingLogger, forceConfiguration) :
+      configureLogging(target, config.logLevel, config.useLevelPrefixes, underlyingLogger, config.useConsoleTrace, forceConfiguration) :
+    configureDefaultLogging(target, underlyingLogger, forceConfiguration);
 }
 
 /**

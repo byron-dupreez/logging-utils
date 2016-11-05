@@ -18,6 +18,11 @@ const TRACE = logging.TRACE;
 // Logging utils functions
 const isLoggingConfigured = logging.isLoggingConfigured;
 const configureLogging = logging.configureLogging;
+const configureDefaultLogging = logging.configureDefaultLogging;
+const configureLoggingFromConfig = logging.configureLoggingFromConfig;
+
+const booleans = require('core-functions/booleans');
+const isBoolean = booleans.isBoolean;
 
 function testLogger(logLevel, useConsole, t) {
   function error() {
@@ -69,6 +74,31 @@ function logOneOfEach(log, logLevel) {
   ++counter;
 }
 
+function checkEnabledsBasedOnLogLevel(t, context, logLevel) {
+  switch (logLevel) {
+    case ERROR:
+      t.notOk(context.warnEnabled, 'warn must not be enabled'); // fallthrough
+    case WARN:
+      t.notOk(context.infoEnabled, 'info must not be enabled'); // fallthrough
+    case INFO:
+      t.notOk(context.debugEnabled, 'debug must not be enabled'); // fallthrough
+    case DEBUG:
+      t.notOk(context.traceEnabled, 'trace must not be enabled');
+      break;
+  }
+  switch (logLevel) {
+    case TRACE:
+      t.ok(context.traceEnabled, 'trace must be enabled'); // fallthrough
+    case DEBUG:
+      t.ok(context.debugEnabled, 'debug must be enabled'); // fallthrough
+    case INFO:
+      t.ok(context.infoEnabled, 'info must be enabled'); // fallthrough
+    case WARN:
+      t.ok(context.warnEnabled, 'warn must be enabled');
+      break;
+  }
+}
+
 // =====================================================================================================================
 // Test isLoggingConfigured
 // =====================================================================================================================
@@ -97,10 +127,7 @@ test('configureLogging on existing object with TRACE level with test logger & pr
   configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.ok(context.infoEnabled, 'info must be enabled');
-  t.ok(context.debugEnabled, 'debug must be enabled');
-  t.ok(context.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, TRACE);
 
   logOneOfEach(context, logLevel);
 
@@ -118,10 +145,7 @@ test('configureLogging on existing object with DEBUG level with test logger & pr
   configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.ok(context.infoEnabled, 'info must be enabled');
-  t.ok(context.debugEnabled, 'debug must be enabled');
-  t.notOk(context.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, DEBUG);
 
   logOneOfEach(context, logLevel);
 
@@ -139,10 +163,7 @@ test('configureLogging on existing object with INFO level with test logger & pre
   configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.ok(context.infoEnabled, 'info must be enabled');
-  t.notOk(context.debugEnabled, 'debug must not be enabled');
-  t.notOk(context.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, INFO);
 
   logOneOfEach(context, logLevel);
 
@@ -160,10 +181,7 @@ test('configureLogging on existing object with WARN level with test logger & pre
   configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.notOk(context.infoEnabled, 'info must not be enabled');
-  t.notOk(context.debugEnabled, 'debug must not be enabled');
-  t.notOk(context.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, WARN);
 
   logOneOfEach(context, logLevel);
 
@@ -181,10 +199,7 @@ test('configureLogging on existing object with ERROR level with test logger & pr
   configureLogging(context, logLevel, useLevelPrefixes, logger, useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
-  t.notOk(context.warnEnabled, 'warn must not be enabled');
-  t.notOk(context.infoEnabled, 'info must not be enabled');
-  t.notOk(context.debugEnabled, 'debug must not be enabled');
-  t.notOk(context.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, ERROR);
 
   logOneOfEach(context, logLevel);
 
@@ -203,10 +218,7 @@ test('configureLogging on new object with TRACE level with test logger & prefixe
   const logger = testLogger(logLevel, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.ok(log.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
   logOneOfEach(log, logLevel);
 
@@ -221,10 +233,7 @@ test('configureLogging on new object with DEBUG level with test logger & prefixe
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
   logOneOfEach(log, logLevel);
 
@@ -239,10 +248,7 @@ test('configureLogging on new object with INFO level with test logger & prefixes
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, INFO);
 
   logOneOfEach(log, logLevel);
 
@@ -257,10 +263,7 @@ test('configureLogging on new object with WARN level with test logger & prefixes
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, WARN);
 
   logOneOfEach(log, logLevel);
 
@@ -275,10 +278,7 @@ test('configureLogging on new object with ERROR level with test logger & prefixe
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsole, true);
 
-  t.notOk(log.warnEnabled, 'warn must not be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
   logOneOfEach(log, logLevel);
 
@@ -298,10 +298,7 @@ test('configureLogging on new object with TRACE level with console & prefixes', 
   const logger = testLogger(logLevel, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.ok(log.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
   logOneOfEach(log, logLevel);
 
@@ -316,10 +313,7 @@ test('configureLogging on new object with DEBUG level with console & prefixes', 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
   logOneOfEach(log, logLevel);
 
@@ -334,10 +328,7 @@ test('configureLogging on new object with INFO level with console & prefixes', t
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, INFO);
 
   logOneOfEach(log, logLevel);
 
@@ -352,10 +343,7 @@ test('configureLogging on new object with WARN level with console & prefixes', t
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, WARN);
 
   logOneOfEach(log, logLevel);
 
@@ -370,10 +358,7 @@ test('configureLogging on new object with ERROR level with console & prefixes', 
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.notOk(log.warnEnabled, 'warn must not be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
   logOneOfEach(log, logLevel);
 
@@ -394,10 +379,7 @@ test('configureLogging on new object with TRACE level with console & no prefixes
   const logger = testLogger(logLevel, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.ok(log.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
   logOneOfEach(log, logLevel);
 
@@ -412,10 +394,7 @@ test('configureLogging on new object with DEBUG level with console & no prefixes
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.ok(log.debugEnabled, 'debug must be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
   logOneOfEach(log, logLevel);
 
@@ -430,10 +409,7 @@ test('configureLogging on new object with INFO level with console & no prefixes'
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.ok(log.infoEnabled, 'info must be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, INFO);
 
   logOneOfEach(log, logLevel);
 
@@ -448,10 +424,7 @@ test('configureLogging on new object with WARN level with console & no prefixes'
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.ok(log.warnEnabled, 'warn must be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, WARN);
 
   logOneOfEach(log, logLevel);
 
@@ -466,10 +439,7 @@ test('configureLogging on new object with ERROR level with console & no prefixes
   const logger = testLogger(logLevel, useLevelPrefixes, useConsole, t);
   const log = configureLogging({}, logLevel, useLevelPrefixes, logger, useConsoleTrace, true);
 
-  t.notOk(log.warnEnabled, 'warn must not be enabled');
-  t.notOk(log.infoEnabled, 'info must not be enabled');
-  t.notOk(log.debugEnabled, 'debug must not be enabled');
-  t.notOk(log.traceEnabled, 'trace must not be enabled');
+  checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
   logOneOfEach(log, logLevel);
 
@@ -488,20 +458,14 @@ test('configureLogging on existing object MUST NOT override previously configure
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.ok(context.infoEnabled, 'info must be enabled');
-  t.ok(context.debugEnabled, 'debug must be enabled');
-  t.ok(context.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, TRACE);
 
   // Now attempt to override
   configureLogging(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, TRACE, 'logLevel must still be TRACE');
-  t.ok(context.warnEnabled, 'warn must still be enabled');
-  t.ok(context.infoEnabled, 'info must still be enabled');
-  t.ok(context.debugEnabled, 'debug must still be enabled');
-  t.ok(context.traceEnabled, 'trace must still be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, TRACE);
 
   logOneOfEach(context, context.logLevel);
 
@@ -521,23 +485,97 @@ test('configureLogging on existing object MUST override previously configured lo
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
-  t.ok(context.warnEnabled, 'warn must be enabled');
-  t.ok(context.infoEnabled, 'info must be enabled');
-  t.ok(context.debugEnabled, 'debug must be enabled');
-  t.ok(context.traceEnabled, 'trace must be enabled');
+  checkEnabledsBasedOnLogLevel(t, context, TRACE);
 
   // Now attempt to override with ERROR level logging (by using forceConfiguration option)
   configureLogging(context, ERROR, useLevelPrefixes, testLogger(ERROR, useConsole, t), useConsole, true);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, ERROR, 'logLevel must now be ERROR');
-  t.notOk(context.warnEnabled, 'warn must now be disabled');
-  t.notOk(context.infoEnabled, 'info must now be disabled');
-  t.notOk(context.debugEnabled, 'debug must now be disabled');
-  t.notOk(context.traceEnabled, 'trace must now be disabled');
+  checkEnabledsBasedOnLogLevel(t, context, ERROR);
 
   logOneOfEach(context, context.logLevel);
 
   t.end();
 });
 
+
+// =====================================================================================================================
+// Test configureDefaultLogging on existing object with test logger to validate methods
+// =====================================================================================================================
+
+test('configureDefaultLogging on existing object with test logger & defaults', t => {
+  const logLevel = logging.defaultLogLevel;
+  const logger = testLogger(logLevel, false, t);
+
+  // Configure default logging when no logging configured yet (without force)
+  const context = { abc: 123 };
+  configureDefaultLogging(context, logger, false);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  // Now override with something else entirely using force (to change away from previous config settings)
+  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
+  configureLogging(context, overrideLogLevel, !logging.defaultUseLevelPrefixes, testLogger(overrideLogLevel, false, t),
+    !logging.defaultUseConsoleTrace, true);
+
+  // Now do NOT override with default logging configuration when NOT using force
+  configureDefaultLogging(context, logger, false);
+
+  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
+  logOneOfEach(context, overrideLogLevel);
+
+  // Now override with default logging configuration using force
+  configureDefaultLogging(context, logger, true);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  t.end();
+});
+
+
+// =====================================================================================================================
+// Test configureLoggingFromConfig on existing object with test logger to validate methods
+// =====================================================================================================================
+
+test('configureLoggingFromConfig on existing object with test logger & config.logLevel etc.', t => {
+  const logLevel = logging.defaultLogLevel !== TRACE ? TRACE : ERROR;
+  const logger = testLogger(logLevel, false, t);
+
+  // Configure logging from config when no logging configured yet (without force)
+  const context = { abc: 123 };
+  const config = {
+    logLevel: logLevel,
+    useLevelPrefixes: !logging.defaultLogLevel,
+    useConsoleTrace: !logging.defaultUseConsoleTrace
+  };
+  configureLoggingFromConfig(context, config, logger, false);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  // Now override with something else entirely using force (to change away from previous config settings)
+  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
+  configureLogging(context, overrideLogLevel, logging.defaultUseLevelPrefixes, testLogger(overrideLogLevel, false, t),
+    logging.defaultUseConsoleTrace, true);
+
+  // Now do NOT override with logging configuration from config again when NOT using force
+  configureLoggingFromConfig(context, config, logger, false);
+
+  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
+  logOneOfEach(context, overrideLogLevel);
+
+  // Now override with logging configuration from config using force
+  configureLoggingFromConfig(context, config, logger, true);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  t.end();
+});

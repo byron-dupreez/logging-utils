@@ -1,4 +1,4 @@
-# logging-utils v1.0.3
+# logging-utils v1.0.4
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -67,9 +67,36 @@ configureLogging(context, DEBUG, false, console, false, true);
 ```js
 const log = configureLogging({});
 ```
+
 * To configure default logging on an existing object
 ```js
 configureDefaultLogging(context);
+```
+* To configure default logging on an existing object with an explicit logger and forceConfiguration true
+```js
+configureDefaultLogging(context, console, true);
+
+// Alternatives specifying optional underlying logger and/or forceConfiguration 
+configureDefaultLogging(context, console);
+configureDefaultLogging(context, undefined, true);
+```
+
+* To configure logging from a config object with settings under config.logging 
+```js
+const config = { logging: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
+
+configureLoggingFromConfig(context, config);
+
+// Alternatives specifying optional underlying logger and/or forceConfiguration 
+configureLoggingFromConfig(context, config, console);
+configureLoggingFromConfig(context, config, undefined, true);
+```
+
+* To configure logging from a config object with settings directly under config
+```js
+const config = { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own config object
+
+configureLoggingFromConfig(context, config);
 ```
 
 ### 2. Log messages
@@ -132,3 +159,10 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 ### 1.0.3
 - Removed dependency on and replaced usage of `core-functions/functions` functions with standard JS functionality
 - Updated `core-functions` dependency to version 2.0.0
+
+### 1.0.4
+- Added optional `underlyingLogger` and `forceConfiguration` arguments to the `configureDefaultLogging` function
+- Added a new `configureLoggingFromConfig` function to simplify configuring from a config object/file 
+- Added unit tests for `configureDefaultLogging` and `configureLoggingFromConfig` functions
+- Updated `core-functions` dependency to version 2.0.1
+
