@@ -1,4 +1,4 @@
-# logging-utils v1.0.4
+# logging-utils v1.0.5
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -165,4 +165,7 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 - Added a new `configureLoggingFromConfig` function to simplify configuring from a config object/file 
 - Added unit tests for `configureDefaultLogging` and `configureLoggingFromConfig` functions
 - Updated `core-functions` dependency to version 2.0.1
+
+### 1.0.5
+- Updated `core-functions` dependency to version 2.0.2
 
