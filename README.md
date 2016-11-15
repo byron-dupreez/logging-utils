@@ -1,4 +1,4 @@
-# logging-utils v1.0.5
+# logging-utils v1.0.6
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -148,17 +148,12 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
-### 1.0.1
-- Simply set core-functions dependency to 1.1.1
 
-### 1.0.2
-- Added an explicit `configureDefaultLogging` function for clarity.
-- Minor JSDoc updates
-- Updated core-functions dependency to 1.2.0
+### 1.0.6
+- Updated `core-functions` dependency to version 2.0.3
 
-### 1.0.3
-- Removed dependency on and replaced usage of `core-functions/functions` functions with standard JS functionality
-- Updated `core-functions` dependency to version 2.0.0
+### 1.0.5
+- Updated `core-functions` dependency to version 2.0.2
 
 ### 1.0.4
 - Added optional `underlyingLogger` and `forceConfiguration` arguments to the `configureDefaultLogging` function
@@ -166,6 +161,17 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 - Added unit tests for `configureDefaultLogging` and `configureLoggingFromConfig` functions
 - Updated `core-functions` dependency to version 2.0.1
 
-### 1.0.5
-- Updated `core-functions` dependency to version 2.0.2
+### 1.0.3
+- Removed dependency on and replaced usage of `core-functions/functions` functions with standard JS functionality
+- Updated `core-functions` dependency to version 2.0.0
+
+### 1.0.2
+- Added an explicit `configureDefaultLogging` function for clarity.
+- Minor JSDoc updates
+- Updated core-functions dependency to 1.2.0
+
+### 1.0.1
+- Simply set core-functions dependency to 1.1.1
+
+
 
