@@ -42,7 +42,7 @@ module.exports = {
   /** Configures default logging on a target object. */
   configureDefaultLogging: configureDefaultLogging,
   /** Returns a logging settings object constructed from given or default logging options and the given underlyingLogger */
-  getLoggingSettingsOrDefaults: getLoggingSettingsOrDefaults,
+  getDefaultLoggingSettings: getDefaultLoggingSettings,
 
   // Constants for Log Levels
   /** Constant for the ERROR log level */
@@ -154,7 +154,7 @@ function configureLogging(target, settings, forceConfiguration) {
   }
   // Use the given settings (if any) or the default settings (if any missing)
   const underlyingLogger = settings && typeof settings === 'object' ? settings.underlyingLogger : undefined;
-  const loggingSettings = getLoggingSettingsOrDefaults(settings, underlyingLogger);
+  const loggingSettings = getDefaultLoggingSettings(settings, underlyingLogger);
 
   const logLevel = loggingSettings.logLevel;
   const useLevelPrefixes = loggingSettings.useLevelPrefixes;
@@ -200,39 +200,40 @@ function configureLogging(target, settings, forceConfiguration) {
 }
 
 /**
- * Configures the default logging functionality on the given target object, but ONLY if no logging functionality is
- * already configured on the target.
+ * Configures the default logging functionality on the given target object partially overridden by the given logging
+ * options (if any), but ONLY if no logging functionality is already configured on the target.
  *
- * The default configuration uses the following settings:
+ * The default logging configuration uses the following settings:
  * - Log level is set to the local config.loggingOptions.logLevel (if any) or INFO.
  * - Use level prefixes is set to the local config.loggingOptions.useLevelPrefixes (if any) or true.
  * - The underlying logger is set to the given underlyingLogger (if valid) otherwise to console.
  * - Use console trace is set to the local config.loggingOptions.useConsoleTrace (if any) or false.
  *
  * @param {Object} target - the target object to which to add default logging functionality
+ * @param {LoggingOptions|undefined} [options] - optional logging options to use to override the default options
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
  * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the default logging
  * functionality, which will override any previously configured logging functionality on the target object
  * @return {Object} the updated target object
  */
-function configureDefaultLogging(target, underlyingLogger, forceConfiguration) {
-  const defaultSettings = getLoggingSettingsOrDefaults(undefined, underlyingLogger);
-  return configureLogging(target, defaultSettings, forceConfiguration);
+function configureDefaultLogging(target, options, underlyingLogger, forceConfiguration) {
+  const settings = getDefaultLoggingSettings(options, underlyingLogger);
+  return configureLogging(target, settings, forceConfiguration);
 }
 
 /**
- * Returns a logging settings object constructed from the given logging options (if any) and the given underlyingLogger
- * (if any), preferring any options in the given options object over the default options.
+ * Returns the default logging settings either partially or fully overridden by the given logging options (if any) and
+ * the given underlyingLogger (if any).
  *
  * This function is used internally by both {@linkcode configureLogging} and {@linkcode configureDefaultLogging}, but
- * could also be used in custom configurations to get the default settings as a base overridden with your own
- * customisations before calling {@linkcode configureLogging}.
+ * could also be used in custom configurations to get the default settings as a base to be overridden with your custom
+ * settings before calling {@linkcode configureLogging}.
  *
  * @param {LoggingOptions|undefined} [options] - optional logging options to use to override the default options
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
  * @returns {LoggingSettings} a logging settings object
  */
-function getLoggingSettingsOrDefaults(options, underlyingLogger) {
+function getDefaultLoggingSettings(options, underlyingLogger) {
   const logger = isValidLogger(underlyingLogger) ? underlyingLogger : console;
 
   // Check if all of the options were provided, and if so use them instead of looking up defaults
