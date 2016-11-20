@@ -1,4 +1,4 @@
-# logging-utils v1.0.6
+# logging-utils v2.0.0
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -9,7 +9,7 @@ The log levels supported are the following:
 - **TRACE** - logs trace, debug, info, warning and error messages (i.e. all)
 
 Main module:
-- logging-utils.js
+- logging.js
 
 This module is exported as a [Node.js](https://nodejs.org/) module.
 
@@ -31,8 +31,9 @@ const logging = require('logging-utils');
 
 // Logging configuration functions
 const configureLogging = logging.configureLogging;
-const isLoggingConfigured = logging.isLoggingConfigured;
 const configureDefaultLogging = logging.configureDefaultLogging;
+const isLoggingConfigured = logging.isLoggingConfigured;
+const getLoggingSettingsOrDefaults = logging.getLoggingSettingsOrDefaults;
 
 // Log level constants
 const ERROR = logging.ERROR;
@@ -49,54 +50,50 @@ const context = { a: 1, b: 2, c: 3 }; // replace with your own target object to 
 
 * To configure default logging on an existing object:
 ```js
-configureLogging(context);
+configureDefaultLogging(context);
 ```
 * To configure WARN level logging on an existing object
 ```js
-configureLogging(context, WARN);
+configureLogging(context, {logLevel: WARN});
 ```
 * To configure specific logging (WITHOUT overriding any existing logging on context)
 ```js
-configureLogging(context, DEBUG, false, console, false, false);
+const settings = {logLevel: DEBUG, useLevelPrefixes: false, useConsoleTrace: false, underlyingLogger: console};
+configureLogging(context, settings, false);
 ```
 * To configure specific logging (OVERRIDING any existing logging on context!)
 ```js
-configureLogging(context, DEBUG, false, console, false, true);
+configureLogging(context, settings, true);
 ```
 * To configure simple default logging on a new object
 ```js
-const log = configureLogging({});
-```
-
-* To configure default logging on an existing object
-```js
-configureDefaultLogging(context);
+const log = configureDefaultLogging({});
 ```
 * To configure default logging on an existing object with an explicit logger and forceConfiguration true
 ```js
 configureDefaultLogging(context, console, true);
 
-// Alternatives specifying optional underlying logger and/or forceConfiguration 
+// Alternatives specifying only underlying logger or forceConfiguration 
 configureDefaultLogging(context, console);
 configureDefaultLogging(context, undefined, true);
 ```
 
-* To configure logging from a config object with settings under config.logging 
+* To configure logging from a config object (or file) with logging options under config.loggingOptions 
 ```js
-const config = { logging: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
+const config = { loggingOptions: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
+const loggingSettings = getLoggingSettingsOrDefaults(config.loggingOptions);
+configureLogging(context, loggingSettings);
 
-configureLoggingFromConfig(context, config);
-
-// Alternatives specifying optional underlying logger and/or forceConfiguration 
-configureLoggingFromConfig(context, config, console);
-configureLoggingFromConfig(context, config, undefined, true);
+// Alternatives specifying only optional underlying logger or forceConfiguration 
+configureLogging(context, loggingSettings, console);
+configureLogging(context, loggingSettings, undefined, true);
 ```
 
-* To configure logging from a config object with settings directly under config
+* To configure logging from logging options
 ```js
-const config = { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own config object
-
-configureLoggingFromConfig(context, config);
+const options = { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own config object
+const loggingSettings = getLoggingSettingsOrDefaults(options);
+configureLogging(context, loggingSettings);
 ```
 
 ### 2. Log messages
@@ -149,6 +146,19 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
 
+### 2.0.0
+- Changed `logging-utils` configuration API to synchronize with similar changes done to `aws-core-utils/stages` 
+  configuration and `aws-stream-consumer/stream-processing` configuration.
+  - Changed `configureLogging` function API to replace multiple arguments with single `settings` argument
+  - Added `getLoggingSettingsOrDefaults` function to facilitate overriding default settings
+  - Changed `configureDefaultLogging` function to use new `getLoggingSettingsOrDefaults` function
+  - Added typedefs for `LoggingSettings` and `LoggingOptions` to better define parameter and return types
+  - Removed obsolete `configureLoggingFromConfig` function
+  - Removed obsolete `finaliseLogLevel`, `finaliseUseLevelPrefixes` and `finaliseUseConsoleTrace` functions
+  - Removed `defaultLogLevel`, `defaultUseLevelPrefixes` and `defaultUseConsoleTrace` properties & config.json settings 
+  - Fixed unit tests to synchronize with API changes
+- Renamed `logging-utils` module to `logging` module.
+  
 ### 1.0.6
 - Updated `core-functions` dependency to version 2.0.3
 

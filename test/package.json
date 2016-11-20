@@ -1,13 +1,13 @@
 {
   "name": "logging-utils-tests",
   "description": "Unit tests for logging-utils",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "author": "Byron du Preez",
   "license": "Apache-2.0",
   "engines": {
     "node": ">=4.3.2"
   },
-  "main": "logging-utils.test.js",
+  "main": "logging.test.js",
   "scripts": {
     "test": "tape ./*.test.js"
   },

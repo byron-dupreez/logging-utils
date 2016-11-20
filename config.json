@@ -1,5 +1,7 @@
 {
-  "defaultLogLevel": "info",
-  "defaultUseLevelPrefixes": true,
-  "defaultUseConsoleTrace": false
+  "loggingOptions": {
+    "logLevel": "info",
+    "useLevelPrefixes": true,
+    "useConsoleTrace": false
+  }
 }
