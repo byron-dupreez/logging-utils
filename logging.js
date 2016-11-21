@@ -18,6 +18,7 @@
 const strings = require('core-functions/strings');
 const isBlank = strings.isBlank;
 const isString = strings.isString;
+const stringify = strings.stringify;
 
 function noop() {
 }
@@ -37,12 +38,14 @@ module.exports = {
   // Functions to configure logging
   /** Returns true, if the given target already has logging functionality configured on it; otherwise returns false. */
   isLoggingConfigured: isLoggingConfigured,
-  /** Configures logging on a target object, based on a specified log level. */
+  /** Configures a target object with logging functionality based on given logging settings */
   configureLogging: configureLogging,
-  /** Configures default logging on a target object. */
+  /** Configures a target object with default logging functionality partially overridden with given logging options */
   configureDefaultLogging: configureDefaultLogging,
   /** Returns a logging settings object constructed from given or default logging options and the given underlyingLogger */
   getDefaultLoggingSettings: getDefaultLoggingSettings,
+  /** A convenience function to configure a target object with logging functionality based on either settings or options, if not already configured */
+  configureLoggingIfNotConfigured: configureLoggingIfNotConfigured,
 
   // Constants for Log Levels
   /** Constant for the ERROR log level */
@@ -344,4 +347,26 @@ function withPrefix(logFn, logLevelPrefix) {
   }
 
   return logWithPrefix;
+}
+
+/**
+ * Configures the given target object with logging functionality using the given logging settings (if any) or using
+ * default logging settings partially overridden by the given logging options (if any), but ONLY if logging is not
+ * already configured on the given context.
+ * @param {Object} target - the context to configure with logging
+ * @param {LoggingSettings|undefined} [settings] - optional logging settings to use
+ * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
+ * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
+ * @param {string|undefined} [caller] - optional arbitrary text to identify the caller of this function
+ */
+function configureLoggingIfNotConfigured(target, settings, options, underlyingLogger, caller) {
+  if (!isLoggingConfigured(target)) {
+    if (settings && typeof settings === 'object') {
+      configureLogging(target, settings, true);
+      target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used logging settings (${stringify(settings)})`);
+    } else {
+      configureDefaultLogging(target, options, underlyingLogger, true);
+      target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used default logging configuration with options (${stringify(options)})`);
+    }
+  }
 }

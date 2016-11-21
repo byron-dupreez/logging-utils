@@ -20,6 +20,7 @@ const isLoggingConfigured = logging.isLoggingConfigured;
 const configureLogging = logging.configureLogging;
 const configureDefaultLogging = logging.configureDefaultLogging;
 const getDefaultLoggingSettings = logging.getDefaultLoggingSettings;
+const configureLoggingIfNotConfigured = logging.configureLoggingIfNotConfigured;
 
 const booleans = require('core-functions/booleans');
 const isBoolean = booleans.isBoolean;
@@ -876,3 +877,98 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
 
   t.end();
 });
+
+// =====================================================================================================================
+// Test configureLoggingIfNotConfigured with settings
+// =====================================================================================================================
+
+test('configureLoggingIfNotConfigured with settings', t => {
+  const logLevel = defaultSettings.logLevel;
+  const logger = testLogger(logLevel, false, t);
+
+  // Configure default logging when no logging configured yet (without force)
+  const context = {abc: 123};
+  const settings = getDefaultLoggingSettings(undefined, logger);
+  const options = undefined;
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test1');
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  // Now override with something else entirely using force (to change away from previous config settings)
+  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
+  const overrideSettings = {
+    logLevel: overrideLogLevel,
+    useLevelPrefixes: !defaultSettings.useLevelPrefixes,
+    useConsoleTrace: !defaultSettings.useConsoleTrace,
+    underlyingLogger: testLogger(overrideLogLevel, false, t)
+  };
+  configureLogging(context, overrideSettings, true);
+
+  // Now do NOT override with default logging configuration (since already configured)
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test2');
+
+  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
+  logOneOfEach(context, overrideLogLevel);
+
+  // Now override with default logging configuration (by first partially clearing logging from the context)
+  context.error = undefined;
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test3');
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  t.end();
+});
+
+// =====================================================================================================================
+// Test configureLoggingIfNotConfigured with options
+// =====================================================================================================================
+
+test('configureLogging with getDefaultLoggingSettings on existing object with test logger & config.logLevel etc.', t => {
+  const logLevel = defaultSettings.logLevel !== TRACE ? TRACE : ERROR;
+  const logger = testLogger(logLevel, false, t);
+
+  // Configure logging from config when no logging configured yet (without force)
+  const context = {abc: 123};
+  const settings = undefined; //getDefaultLoggingSettings(options, logger);
+  const options = {
+    logLevel: logLevel,
+    useLevelPrefixes: !defaultSettings.useLevelPrefixes,
+    useConsoleTrace: !defaultSettings.useConsoleTrace
+  };
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test1');
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  // Now override with something else entirely using force (to change away from previous config settings)
+  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
+  const overrideOptions = {
+    logLevel: overrideLogLevel,
+    useLevelPrefixes: defaultSettings.useLevelPrefixes,
+    useConsoleTrace: defaultSettings.useConsoleTrace,
+  };
+  const overrideSettings = getDefaultLoggingSettings(overrideOptions, testLogger(overrideLogLevel, false, t));
+  configureLogging(context, overrideSettings, true);
+
+  // Now do NOT override with logging configuration again (since already configured)
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test2');
+
+  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
+  logOneOfEach(context, overrideLogLevel);
+
+  // Now override with logging configuration using force (by first partially clearing logging from the context)
+  context.error = undefined;
+  configureLoggingIfNotConfigured(context, settings, options, logger, 'test3');
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  t.end();
+});
+

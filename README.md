@@ -1,4 +1,4 @@
-# logging-utils v2.0.1
+# logging-utils v2.0.2
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -152,6 +152,10 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
 
+### 2.0.2
+- Changes to `logging.js` module:
+  - Added a convenience `configureLoggingIfNotConfigured` function
+
 ### 2.0.1
 - Changes to `logging.js` module:
   - Changed `configureDefaultLogging` function to accept a new `options` argument of type `LoggingOptions` 
@@ -194,6 +198,3 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ### 1.0.1
 - Simply set core-functions dependency to 1.1.1
-
-
-
