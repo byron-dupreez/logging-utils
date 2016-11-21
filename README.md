@@ -1,4 +1,4 @@
-# logging-utils v2.0.2
+# logging-utils v2.0.3
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -151,6 +151,10 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+
+### 2.0.3
+- Changes to `logging.js` module:
+  - Added missing return value to `configureLoggingIfNotConfigured` function
 
 ### 2.0.2
 - Changes to `logging.js` module:

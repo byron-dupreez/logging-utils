@@ -358,6 +358,7 @@ function withPrefix(logFn, logLevelPrefix) {
  * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
  * @param {string|undefined} [caller] - optional arbitrary text to identify the caller of this function
+ * @returns {Object} the given target object
  */
 function configureLoggingIfNotConfigured(target, settings, options, underlyingLogger, caller) {
   if (!isLoggingConfigured(target)) {
@@ -369,4 +370,5 @@ function configureLoggingIfNotConfigured(target, settings, options, underlyingLo
       target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used default logging configuration with options (${stringify(options)})`);
     }
   }
+  return target;
 }
