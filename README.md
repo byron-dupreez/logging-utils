@@ -1,4 +1,4 @@
-# logging-utils v2.0.3
+# logging-utils v2.0.4
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -30,10 +30,11 @@ $ npm i --save logging-utils
 const logging = require('logging-utils');
 
 // Logging configuration functions
-const configureLogging = logging.configureLogging;
-const configureDefaultLogging = logging.configureDefaultLogging;
 const isLoggingConfigured = logging.isLoggingConfigured;
+const configureLogging = logging.configureLogging;
 const getDefaultLoggingSettings = logging.getDefaultLoggingSettings;
+const configureDefaultLogging = logging.configureDefaultLogging;
+const configureLoggingWithSettingsOrOptions = logging.configureLoggingWithSettingsOrOptions;
 
 // Log level constants
 const ERROR = logging.ERROR;
@@ -82,8 +83,8 @@ configureDefaultLogging(context, options, undefined, true);
 
 * To configure logging from a config object (or file) with logging options under config.loggingOptions 
 ```js
-const config = { loggingOptions: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
-const loggingSettings = getDefaultLoggingSettings(config.loggingOptions);
+const options = { loggingOptions: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
+const loggingSettings = getDefaultLoggingSettings(options.loggingOptions);
 configureLogging(context, loggingSettings);
 // or as an alternative to the above 2 lines, just use the following:
 configureDefaultLogging(context, config.loggingOptions);
@@ -100,6 +101,16 @@ const loggingSettings = getDefaultLoggingSettings(options);
 configureLogging(context, loggingSettings);
 // or as an alternative to the above 2 lines, just use the following:
 configureDefaultLogging(context, options);
+```
+
+* To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - WITHOUT overriding any existing logging on context
+```js
+configureLoggingWithSettingsOrOptions(context, loggingSettings, loggingOptions, underlyingLogger, false);
+```
+
+* To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - OVERRIDING any existing logging on context!
+```js
+configureLoggingWithSettingsOrOptions(context, loggingSettings, loggingOptions, underlyingLogger, true);
 ```
 
 ### 2. Log messages
@@ -152,6 +163,10 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
 
+### 2.0.4
+- Changes to `logging.js` module:
+  - Added new `configureLoggingWithSettingsOrOptions` function to simplify programmatic configuration
+  
 ### 2.0.3
 - Changes to `logging.js` module:
   - Added missing return value to `configureLoggingIfNotConfigured` function

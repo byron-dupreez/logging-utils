@@ -44,6 +44,8 @@ module.exports = {
   configureDefaultLogging: configureDefaultLogging,
   /** Returns a logging settings object constructed from given or default logging options and the given underlyingLogger */
   getDefaultLoggingSettings: getDefaultLoggingSettings,
+  /** A convenience function to configure a target object with logging functionality based on either settings or options, if forced or not already configured */
+  configureLoggingWithSettingsOrOptions: configureLoggingWithSettingsOrOptions,
   /** A convenience function to configure a target object with logging functionality based on either settings or options, if not already configured */
   configureLoggingIfNotConfigured: configureLoggingIfNotConfigured,
 
@@ -369,6 +371,36 @@ function configureLoggingIfNotConfigured(target, settings, options, underlyingLo
       configureDefaultLogging(target, options, underlyingLogger, true);
       target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used default logging configuration with options (${stringify(options)})`);
     }
+  }
+  return target;
+}
+
+/**
+ * Configures the given target object with logging functionality using the given logging settings (if any) or using
+ * default logging settings partially overridden by the given logging options (if any), but ONLY if forceConfiguration
+ * is true or if there is no logging functionality already configured on the target,
+ * @param {Object} target - the context to configure with logging
+ * @param {LoggingSettings|undefined} [settings] - optional logging settings to use
+ * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
+ * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
+ * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
+ * which will override any previously configured logging functionality on the target object
+ * @returns {Object} the given target object
+ */
+function configureLoggingWithSettingsOrOptions(target, settings, options, underlyingLogger, forceConfiguration) {
+  // Check if logging was already configured
+  const loggingWasConfigured = isLoggingConfigured(target);
+
+  // Determine the logging settings to be used
+  const loggingSettingsAvailable = settings && typeof settings === 'object';
+  const loggingSettings = loggingSettingsAvailable ? settings : getDefaultLoggingSettings(options, underlyingLogger);
+
+  // Configure logging with the given or derived logging settings
+  configureLogging(target, loggingSettings, forceConfiguration);
+
+  // Log a warning if no settings and no options were provided and the default settings were applied
+  if (!loggingSettingsAvailable && (!options || typeof options !== 'object') && (forceConfiguration || !loggingWasConfigured)) {
+    target.warn(`Logging was configured without settings or options - used default logging configuration (${stringify(loggingSettings)})`);
   }
   return target;
 }
