@@ -20,6 +20,8 @@ const isBlank = strings.isBlank;
 const isString = strings.isString;
 const stringify = strings.stringify;
 
+const Objects = require('core-functions/objects');
+
 function noop() {
 }
 
@@ -38,16 +40,14 @@ module.exports = {
   // Functions to configure logging
   /** Returns true, if the given target already has logging functionality configured on it; otherwise returns false. */
   isLoggingConfigured: isLoggingConfigured,
-  /** Configures a target object with logging functionality based on given logging settings */
+  /** Configures a target object with logging functionality using given logging settings (if any) or using default logging settings partially overridden by given logging options (if any) */
   configureLogging: configureLogging,
+  /** Configures a target object with logging functionality based on given logging settings */
+  configureLoggingWithSettings: configureLoggingWithSettings,
   /** Configures a target object with default logging functionality partially overridden with given logging options */
   configureDefaultLogging: configureDefaultLogging,
   /** Returns a logging settings object constructed from given or default logging options and the given underlyingLogger */
   getDefaultLoggingSettings: getDefaultLoggingSettings,
-  /** A convenience function to configure a target object with logging functionality based on either settings or options, if forced or not already configured */
-  configureLoggingWithSettingsOrOptions: configureLoggingWithSettingsOrOptions,
-  /** A convenience function to configure a target object with logging functionality based on either settings or options, if not already configured */
-  configureLoggingIfNotConfigured: configureLoggingIfNotConfigured,
 
   // Constants for Log Levels
   /** Constant for the ERROR log level */
@@ -113,6 +113,39 @@ function isLoggingConfigured(target) {
 }
 
 /**
+ * Configures the given target object with logging functionality using the given logging settings (if any) or using
+ * default logging settings partially overridden by the given logging options (if any), but ONLY if forceConfiguration
+ * is true or if there is no logging functionality already configured on the target object.
+ * @param {Object} target - the context to configure with logging
+ * @param {LoggingSettings|undefined} [settings] - optional logging settings to use
+ * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
+ * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
+ * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
+ * which will override any previously configured logging functionality on the target object
+ * @returns {Object} the given target object
+ */
+function configureLogging(target, settings, options, underlyingLogger, forceConfiguration) {
+  // Check if logging was already configured
+  const loggingWasConfigured = isLoggingConfigured(target);
+
+  // Determine the logging settings to be used
+  const loggingSettingsAvailable = settings && typeof settings === 'object';
+  const loggingOptionsAvailable = options && typeof options === 'object';
+  const loggingSettings = loggingSettingsAvailable ?
+    loggingOptionsAvailable ? Objects.merge(options, settings, false, false) : settings :
+    getDefaultLoggingSettings(options, underlyingLogger);
+
+  // Configure logging with the given or derived logging settings
+  configureLoggingWithSettings(target, loggingSettings, forceConfiguration);
+
+  // Log a warning if no settings and no options were provided and the default settings were applied
+  if (!loggingSettingsAvailable && (!options || typeof options !== 'object') && (forceConfiguration || !loggingWasConfigured)) {
+    target.warn(`Logging was configured without settings or options - used default logging configuration (${stringify(loggingSettings)})`);
+  }
+  return target;
+}
+
+/**
  * Configures logging functionality on the given target object, but ONLY if forceConfiguration is true or if there is no
  * logging functionality already configured on the target, based on the given logging settings and returns the target
  * updated with the following:
@@ -127,7 +160,7 @@ function isLoggingConfigured(target) {
  *
  * Example 1 - primary usage (to configure logging on an existing object):
  * const context = {...}; // an existing object on which to configure logging
- * configureLogging(context, {logLevel: 'info'});
+ * configureLoggingWithSettings(context, {logLevel: 'info'});
  * let err = new Error('Some arbitrary error');
  * context.error('Insert error message here', err.stack);
  * if (context.warnEnabled) context.warn('Insert warning here');
@@ -137,7 +170,7 @@ function isLoggingConfigured(target) {
  *
  * Example 2 - secondary usage (to configure logging on a new object):
  * const settings = {logLevel: 'info', useLevelPrefixes: true, underlyingLogger: console, useConsoleTrace: false};
- * const log = configureLogging({}, settings, true);
+ * const log = configureLoggingWithSettings({}, settings, true);
  * let err = new Error('Some arbitrary error');
  * log.error('Insert error message here', err.stack);
  * log.warn('Insert warning here');
@@ -151,7 +184,7 @@ function isLoggingConfigured(target) {
  * which will override any previously configured logging functionality on the target object
  * @return {Object} the updated target object
  */
-function configureLogging(target, settings, forceConfiguration) {
+function configureLoggingWithSettings(target, settings, forceConfiguration) {
   // If forceConfiguration is false check if the given target already has logging functionality configured on it
   // and, if so, do nothing more and simply return the target as is (to prevent overriding an earlier configuration)
   if (!forceConfiguration && isLoggingConfigured(target)) {
@@ -223,16 +256,16 @@ function configureLogging(target, settings, forceConfiguration) {
  */
 function configureDefaultLogging(target, options, underlyingLogger, forceConfiguration) {
   const settings = getDefaultLoggingSettings(options, underlyingLogger);
-  return configureLogging(target, settings, forceConfiguration);
+  return configureLoggingWithSettings(target, settings, forceConfiguration);
 }
 
 /**
  * Returns the default logging settings either partially or fully overridden by the given logging options (if any) and
  * the given underlyingLogger (if any).
  *
- * This function is used internally by both {@linkcode configureLogging} and {@linkcode configureDefaultLogging}, but
- * could also be used in custom configurations to get the default settings as a base to be overridden with your custom
- * settings before calling {@linkcode configureLogging}.
+ * This function is used internally by {@linkcode configureLogging}, {@linkcode configureLoggingWithSettings} and
+ * {@linkcode configureDefaultLogging}, but could also be used in custom configurations to get the default settings as a
+ * base to be overridden with your custom settings before calling {@linkcode configureLogging}.
  *
  * @param {LoggingOptions|undefined} [options] - optional logging options to use to override the default options
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
@@ -349,58 +382,4 @@ function withPrefix(logFn, logLevelPrefix) {
   }
 
   return logWithPrefix;
-}
-
-/**
- * Configures the given target object with logging functionality using the given logging settings (if any) or using
- * default logging settings partially overridden by the given logging options (if any), but ONLY if logging is not
- * already configured on the given context.
- * @param {Object} target - the context to configure with logging
- * @param {LoggingSettings|undefined} [settings] - optional logging settings to use
- * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
- * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
- * @param {string|undefined} [caller] - optional arbitrary text to identify the caller of this function
- * @returns {Object} the given target object
- */
-function configureLoggingIfNotConfigured(target, settings, options, underlyingLogger, caller) {
-  if (!isLoggingConfigured(target)) {
-    if (settings && typeof settings === 'object') {
-      configureLogging(target, settings, true);
-      target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used logging settings (${stringify(settings)})`);
-    } else {
-      configureDefaultLogging(target, options, underlyingLogger, true);
-      target.warn(`Logging was not configured${caller ? ` before calling ${caller}` : ''} - used default logging configuration with options (${stringify(options)})`);
-    }
-  }
-  return target;
-}
-
-/**
- * Configures the given target object with logging functionality using the given logging settings (if any) or using
- * default logging settings partially overridden by the given logging options (if any), but ONLY if forceConfiguration
- * is true or if there is no logging functionality already configured on the target,
- * @param {Object} target - the context to configure with logging
- * @param {LoggingSettings|undefined} [settings] - optional logging settings to use
- * @param {LoggingOptions|undefined} [options] - optional logging options to use if no logging settings provided
- * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
- * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
- * which will override any previously configured logging functionality on the target object
- * @returns {Object} the given target object
- */
-function configureLoggingWithSettingsOrOptions(target, settings, options, underlyingLogger, forceConfiguration) {
-  // Check if logging was already configured
-  const loggingWasConfigured = isLoggingConfigured(target);
-
-  // Determine the logging settings to be used
-  const loggingSettingsAvailable = settings && typeof settings === 'object';
-  const loggingSettings = loggingSettingsAvailable ? settings : getDefaultLoggingSettings(options, underlyingLogger);
-
-  // Configure logging with the given or derived logging settings
-  configureLogging(target, loggingSettings, forceConfiguration);
-
-  // Log a warning if no settings and no options were provided and the default settings were applied
-  if (!loggingSettingsAvailable && (!options || typeof options !== 'object') && (forceConfiguration || !loggingWasConfigured)) {
-    target.warn(`Logging was configured without settings or options - used default logging configuration (${stringify(loggingSettings)})`);
-  }
-  return target;
 }

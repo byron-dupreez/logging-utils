@@ -17,14 +17,13 @@ const DEBUG = logging.DEBUG;
 const TRACE = logging.TRACE;
 // Logging utils functions
 const isLoggingConfigured = logging.isLoggingConfigured;
-const configureLogging = logging.configureLogging;
+const configureLoggingWithSettings = logging.configureLoggingWithSettings;
 const configureDefaultLogging = logging.configureDefaultLogging;
 const getDefaultLoggingSettings = logging.getDefaultLoggingSettings;
-const configureLoggingIfNotConfigured = logging.configureLoggingIfNotConfigured;
-const configureLoggingWithSettingsOrOptions = logging.configureLoggingWithSettingsOrOptions;
+const configureLogging = logging.configureLogging;
 
 const booleans = require('core-functions/booleans');
-const isBoolean = booleans.isBoolean;
+//const isBoolean = booleans.isBoolean;
 
 const defaultSettings = logging.getDefaultLoggingSettings();
 
@@ -116,17 +115,17 @@ test('isLoggingConfigured', t => {
     useConsoleTrace: false,
     underlyingLogger: undefined
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   t.equal(isLoggingConfigured(log), true, 'logging must be configured');
   t.end();
 });
 
 // =====================================================================================================================
-// Test configureLogging on existing object with test logger to validate methods
+// Test configureLoggingWithSettings on existing object with test logger to validate methods
 // =====================================================================================================================
 
-test('configureLogging on existing object with TRACE level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on existing object with TRACE level with test logger & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -140,7 +139,7 @@ test('configureLogging on existing object with TRACE level with test logger & pr
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   checkEnabledsBasedOnLogLevel(t, context, TRACE);
@@ -150,7 +149,7 @@ test('configureLogging on existing object with TRACE level with test logger & pr
   t.end();
 });
 
-test('configureLogging on existing object with DEBUG level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on existing object with DEBUG level with test logger & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -164,7 +163,7 @@ test('configureLogging on existing object with DEBUG level with test logger & pr
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   checkEnabledsBasedOnLogLevel(t, context, DEBUG);
@@ -174,7 +173,7 @@ test('configureLogging on existing object with DEBUG level with test logger & pr
   t.end();
 });
 
-test('configureLogging on existing object with INFO level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on existing object with INFO level with test logger & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -188,7 +187,7 @@ test('configureLogging on existing object with INFO level with test logger & pre
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   checkEnabledsBasedOnLogLevel(t, context, INFO);
@@ -198,7 +197,7 @@ test('configureLogging on existing object with INFO level with test logger & pre
   t.end();
 });
 
-test('configureLogging on existing object with WARN level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on existing object with WARN level with test logger & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -212,7 +211,7 @@ test('configureLogging on existing object with WARN level with test logger & pre
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   checkEnabledsBasedOnLogLevel(t, context, WARN);
@@ -222,7 +221,7 @@ test('configureLogging on existing object with WARN level with test logger & pre
   t.end();
 });
 
-test('configureLogging on existing object with ERROR level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on existing object with ERROR level with test logger & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -236,7 +235,7 @@ test('configureLogging on existing object with ERROR level with test logger & pr
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   checkEnabledsBasedOnLogLevel(t, context, ERROR);
@@ -247,10 +246,10 @@ test('configureLogging on existing object with ERROR level with test logger & pr
 });
 
 // =====================================================================================================================
-// Test configureLogging on new object with test logger to validate methods
+// Test configureLoggingWithSettings on new object with test logger to validate methods
 // =====================================================================================================================
 
-test('configureLogging on new object with TRACE level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on new object with TRACE level with test logger & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = false;
   const useConsole = false;
@@ -262,7 +261,7 @@ test('configureLogging on new object with TRACE level with test logger & prefixe
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
@@ -271,7 +270,7 @@ test('configureLogging on new object with TRACE level with test logger & prefixe
   t.end();
 });
 
-test('configureLogging on new object with DEBUG level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on new object with DEBUG level with test logger & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -283,7 +282,7 @@ test('configureLogging on new object with DEBUG level with test logger & prefixe
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
@@ -292,7 +291,7 @@ test('configureLogging on new object with DEBUG level with test logger & prefixe
   t.end();
 });
 
-test('configureLogging on new object with INFO level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on new object with INFO level with test logger & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -304,7 +303,7 @@ test('configureLogging on new object with INFO level with test logger & prefixes
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, INFO);
 
@@ -313,7 +312,7 @@ test('configureLogging on new object with INFO level with test logger & prefixes
   t.end();
 });
 
-test('configureLogging on new object with WARN level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on new object with WARN level with test logger & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -325,7 +324,7 @@ test('configureLogging on new object with WARN level with test logger & prefixes
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, WARN);
 
@@ -334,7 +333,7 @@ test('configureLogging on new object with WARN level with test logger & prefixes
   t.end();
 });
 
-test('configureLogging on new object with ERROR level with test logger & prefixes', t => {
+test('configureLoggingWithSettings on new object with ERROR level with test logger & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = false;
@@ -346,7 +345,7 @@ test('configureLogging on new object with ERROR level with test logger & prefixe
     useConsoleTrace: useConsole,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
@@ -356,11 +355,11 @@ test('configureLogging on new object with ERROR level with test logger & prefixe
 });
 
 // =====================================================================================================================
-// Test configureLogging on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes true
+// Test configureLoggingWithSettings on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes true
 // =====================================================================================================================
 const useConsoleTrace = false;
 
-test('configureLogging on new object with TRACE level with console & prefixes', t => {
+test('configureLoggingWithSettings on new object with TRACE level with console & prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = true;
   const useConsole = true;
@@ -372,7 +371,7 @@ test('configureLogging on new object with TRACE level with console & prefixes', 
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
@@ -381,7 +380,7 @@ test('configureLogging on new object with TRACE level with console & prefixes', 
   t.end();
 });
 
-test('configureLogging on new object with DEBUG level with console & prefixes', t => {
+test('configureLoggingWithSettings on new object with DEBUG level with console & prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = true;
   const useConsole = true;
@@ -393,7 +392,7 @@ test('configureLogging on new object with DEBUG level with console & prefixes', 
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
@@ -402,7 +401,7 @@ test('configureLogging on new object with DEBUG level with console & prefixes', 
   t.end();
 });
 
-test('configureLogging on new object with INFO level with console & prefixes', t => {
+test('configureLoggingWithSettings on new object with INFO level with console & prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = true;
   const useConsole = true;
@@ -414,7 +413,7 @@ test('configureLogging on new object with INFO level with console & prefixes', t
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, INFO);
 
@@ -423,7 +422,7 @@ test('configureLogging on new object with INFO level with console & prefixes', t
   t.end();
 });
 
-test('configureLogging on new object with WARN level with console & prefixes', t => {
+test('configureLoggingWithSettings on new object with WARN level with console & prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = true;
   const useConsole = true;
@@ -435,7 +434,7 @@ test('configureLogging on new object with WARN level with console & prefixes', t
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, WARN);
 
@@ -444,7 +443,7 @@ test('configureLogging on new object with WARN level with console & prefixes', t
   t.end();
 });
 
-test('configureLogging on new object with ERROR level with console & prefixes', t => {
+test('configureLoggingWithSettings on new object with ERROR level with console & prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = true;
   const useConsole = true;
@@ -456,7 +455,7 @@ test('configureLogging on new object with ERROR level with console & prefixes', 
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
@@ -467,10 +466,10 @@ test('configureLogging on new object with ERROR level with console & prefixes', 
 
 
 // =====================================================================================================================
-// Test configureLogging on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes false
+// Test configureLoggingWithSettings on new object with console (i.e. test real usage for Lambdas) and useLevelPrefixes false
 // =====================================================================================================================
 
-test('configureLogging on new object with TRACE level with console & no prefixes', t => {
+test('configureLoggingWithSettings on new object with TRACE level with console & no prefixes', t => {
   const logLevel = TRACE;
   const useLevelPrefixes = false;
   const useConsole = true;
@@ -482,7 +481,7 @@ test('configureLogging on new object with TRACE level with console & no prefixes
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, TRACE);
 
@@ -491,7 +490,7 @@ test('configureLogging on new object with TRACE level with console & no prefixes
   t.end();
 });
 
-test('configureLogging on new object with DEBUG level with console & no prefixes', t => {
+test('configureLoggingWithSettings on new object with DEBUG level with console & no prefixes', t => {
   const logLevel = DEBUG;
   const useLevelPrefixes = false;
   const useConsole = true;
@@ -503,7 +502,7 @@ test('configureLogging on new object with DEBUG level with console & no prefixes
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, DEBUG);
 
@@ -512,7 +511,7 @@ test('configureLogging on new object with DEBUG level with console & no prefixes
   t.end();
 });
 
-test('configureLogging on new object with INFO level with console & no prefixes', t => {
+test('configureLoggingWithSettings on new object with INFO level with console & no prefixes', t => {
   const logLevel = INFO;
   const useLevelPrefixes = false;
   const useConsole = true;
@@ -524,7 +523,7 @@ test('configureLogging on new object with INFO level with console & no prefixes'
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, INFO);
 
@@ -533,7 +532,7 @@ test('configureLogging on new object with INFO level with console & no prefixes'
   t.end();
 });
 
-test('configureLogging on new object with WARN level with console & no prefixes', t => {
+test('configureLoggingWithSettings on new object with WARN level with console & no prefixes', t => {
   const logLevel = WARN;
   const useLevelPrefixes = false;
   const useConsole = true;
@@ -545,7 +544,7 @@ test('configureLogging on new object with WARN level with console & no prefixes'
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, WARN);
 
@@ -554,7 +553,7 @@ test('configureLogging on new object with WARN level with console & no prefixes'
   t.end();
 });
 
-test('configureLogging on new object with ERROR level with console & no prefixes', t => {
+test('configureLoggingWithSettings on new object with ERROR level with console & no prefixes', t => {
   const logLevel = ERROR;
   const useLevelPrefixes = false;
   const useConsole = true;
@@ -566,7 +565,7 @@ test('configureLogging on new object with ERROR level with console & no prefixes
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: logger
   };
-  const log = configureLogging({}, settings, true);
+  const log = configureLoggingWithSettings({}, settings, true);
 
   checkEnabledsBasedOnLogLevel(t, log, ERROR);
 
@@ -576,10 +575,10 @@ test('configureLogging on new object with ERROR level with console & no prefixes
 });
 
 // =====================================================================================================================
-// Ensure that configureLogging on existing object does NOT override previously configured logging if not forced
+// Ensure that configureLoggingWithSettings on existing object does NOT override previously configured logging if not forced
 // =====================================================================================================================
 
-test('configureLogging on existing object MUST NOT override previously configured logging if not forced', t => {
+test('configureLoggingWithSettings on existing object MUST NOT override previously configured logging if not forced', t => {
   const useLevelPrefixes = true;
   const useConsole = false;
 
@@ -589,7 +588,7 @@ test('configureLogging on existing object MUST NOT override previously configure
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: testLogger(TRACE, useConsole, t)
   };
-  const context = configureLogging({}, settings, true);
+  const context = configureLoggingWithSettings({}, settings, true);
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
@@ -602,7 +601,7 @@ test('configureLogging on existing object MUST NOT override previously configure
     useConsoleTrace: useConsole,
     underlyingLogger: testLogger(ERROR, useConsole, t)
   };
-  configureLogging(context, overrideSettings, false);
+  configureLoggingWithSettings(context, overrideSettings, false);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, TRACE, 'logLevel must still be TRACE');
@@ -614,10 +613,10 @@ test('configureLogging on existing object MUST NOT override previously configure
 });
 
 // =====================================================================================================================
-// Ensure that configureLogging on existing object does override previously configured logging if forced
+// Ensure that configureLoggingWithSettings on existing object does override previously configured logging if forced
 // =====================================================================================================================
 
-test('configureLogging on existing object MUST override previously configured logging if forced', t => {
+test('configureLoggingWithSettings on existing object MUST override previously configured logging if forced', t => {
   const useLevelPrefixes = true;
   const useConsole = false;
 
@@ -628,7 +627,7 @@ test('configureLogging on existing object MUST override previously configured lo
     useConsoleTrace: useConsoleTrace,
     underlyingLogger: testLogger(TRACE, useConsole, t)
   };
-  const context = configureLogging({}, settings, true);
+  const context = configureLoggingWithSettings({}, settings, true);
   context.abc = 123;
 
   t.equal(context.logLevel, TRACE, 'logLevel must be TRACE');
@@ -641,7 +640,7 @@ test('configureLogging on existing object MUST override previously configured lo
     useConsoleTrace: useConsole,
     underlyingLogger: testLogger(ERROR, useConsole, t)
   };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
   t.equal(context.abc, 123, 'context must still be intact');
 
   t.equal(context.logLevel, ERROR, 'logLevel must now be ERROR');
@@ -677,7 +676,7 @@ test('configureDefaultLogging without options on existing object with test logge
     useConsoleTrace: !defaultSettings.useConsoleTrace,
     underlyingLogger: testLogger(overrideLogLevel, false, t)
   };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with default logging configuration when NOT using force
   configureDefaultLogging(context, options, logger, false);
@@ -722,7 +721,7 @@ test('configureDefaultLogging with overridden options on existing object with te
     useConsoleTrace: !defaultSettings.useConsoleTrace,
     underlyingLogger: testLogger(overrideLogLevel, false, t)
   };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with default logging configuration when NOT using force
   configureDefaultLogging(context, options, logger, false);
@@ -741,10 +740,10 @@ test('configureDefaultLogging with overridden options on existing object with te
 });
 
 // =====================================================================================================================
-// Test configureLogging on existing object with test logger to validate methods
+// Test configureLoggingWithSettings on existing object with test logger to validate methods
 // =====================================================================================================================
 
-test('configureLogging on existing object with test logger & config.logLevel etc.', t => {
+test('configureLoggingWithSettings on existing object with test logger & config.logLevel etc.', t => {
   const logLevel = defaultSettings.logLevel !== TRACE ? TRACE : ERROR;
   const logger = testLogger(logLevel, false, t);
 
@@ -756,7 +755,7 @@ test('configureLogging on existing object with test logger & config.logLevel etc
     useConsoleTrace: !defaultSettings.useConsoleTrace,
     underlyingLogger: logger
   };
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -770,16 +769,16 @@ test('configureLogging on existing object with test logger & config.logLevel etc
     useConsoleTrace: defaultSettings.useConsoleTrace,
     underlyingLogger: testLogger(overrideLogLevel, false, t)
   };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with logging configuration again when NOT using force
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
 
   checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
   logOneOfEach(context, overrideLogLevel);
 
   // Now override with logging configuration using force
-  configureLogging(context, settings, true);
+  configureLoggingWithSettings(context, settings, true);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -789,17 +788,17 @@ test('configureLogging on existing object with test logger & config.logLevel etc
 });
 
 // =====================================================================================================================
-// Test configureLogging with default getDefaultLoggingSettings
+// Test configureLoggingWithSettings with default getDefaultLoggingSettings
 // =====================================================================================================================
 
-test('configureLogging with default getDefaultLoggingSettings on existing object with test logger & defaults', t => {
+test('configureLoggingWithSettings with default getDefaultLoggingSettings on existing object with test logger & defaults', t => {
   const logLevel = defaultSettings.logLevel;
   const logger = testLogger(logLevel, false, t);
 
   // Configure default logging when no logging configured yet (without force)
   const context = {abc: 123};
   const defaults = getDefaultLoggingSettings(undefined, logger);
-  configureLogging(context, defaults, false);
+  configureLoggingWithSettings(context, defaults, false);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -813,16 +812,16 @@ test('configureLogging with default getDefaultLoggingSettings on existing object
     useConsoleTrace: !defaultSettings.useConsoleTrace,
     underlyingLogger: testLogger(overrideLogLevel, false, t)
   };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with default logging configuration when NOT using force
-  configureLogging(context, defaults, false);
+  configureLoggingWithSettings(context, defaults, false);
 
   checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
   logOneOfEach(context, overrideLogLevel);
 
   // Now override with default logging configuration using force
-  configureLogging(context, defaults, true);
+  configureLoggingWithSettings(context, defaults, true);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -832,10 +831,10 @@ test('configureLogging with default getDefaultLoggingSettings on existing object
 });
 
 // =====================================================================================================================
-// Test configureLogging with non-default getDefaultLoggingSettings
+// Test configureLoggingWithSettings with non-default getDefaultLoggingSettings
 // =====================================================================================================================
 
-test('configureLogging with getDefaultLoggingSettings on existing object with test logger & config.logLevel etc.', t => {
+test('configureLoggingWithSettings with getDefaultLoggingSettings on existing object with test logger & config.logLevel etc.', t => {
   const logLevel = defaultSettings.logLevel !== TRACE ? TRACE : ERROR;
   const logger = testLogger(logLevel, false, t);
 
@@ -847,7 +846,7 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
     useConsoleTrace: !defaultSettings.useConsoleTrace
   };
   const settings = getDefaultLoggingSettings(options, logger);
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -861,16 +860,16 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
     useConsoleTrace: defaultSettings.useConsoleTrace,
   };
   const overrideSettings = getDefaultLoggingSettings(overrideOptions, testLogger(overrideLogLevel, false, t));
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with logging configuration again when NOT using force
-  configureLogging(context, settings, false);
+  configureLoggingWithSettings(context, settings, false);
 
   checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
   logOneOfEach(context, overrideLogLevel);
 
   // Now override with logging configuration using force
-  configureLogging(context, settings, true);
+  configureLoggingWithSettings(context, settings, true);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -880,10 +879,10 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
 });
 
 // =====================================================================================================================
-// Test configureLoggingIfNotConfigured with settings
+// Test configureLogging with settings
 // =====================================================================================================================
 
-test('configureLoggingIfNotConfigured with settings', t => {
+test('configureLogging with settings', t => {
   const logLevel = defaultSettings.logLevel;
   const logger = testLogger(logLevel, false, t);
 
@@ -891,7 +890,7 @@ test('configureLoggingIfNotConfigured with settings', t => {
   const context = {abc: 123};
   const settings = getDefaultLoggingSettings(undefined, logger);
   const options = undefined;
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test1');
+  configureLogging(context, settings, options, logger, false);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -905,110 +904,16 @@ test('configureLoggingIfNotConfigured with settings', t => {
     useConsoleTrace: !defaultSettings.useConsoleTrace,
     underlyingLogger: testLogger(overrideLogLevel, false, t)
   };
-  configureLogging(context, overrideSettings, true);
-
-  // Now do NOT override with default logging configuration (since already configured)
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test2');
-
-  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
-  logOneOfEach(context, overrideLogLevel);
-
-  // Now override with default logging configuration (by first partially clearing logging from the context)
-  context.error = undefined;
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test3');
-
-  t.equal(context.abc, 123, 'context must still be intact');
-  checkEnabledsBasedOnLogLevel(t, context, logLevel);
-  logOneOfEach(context, logLevel);
-
-  t.end();
-});
-
-// =====================================================================================================================
-// Test configureLoggingIfNotConfigured with options
-// =====================================================================================================================
-
-test('configureLogging with getDefaultLoggingSettings on existing object with test logger & config.logLevel etc.', t => {
-  const logLevel = defaultSettings.logLevel !== TRACE ? TRACE : ERROR;
-  const logger = testLogger(logLevel, false, t);
-
-  // Configure logging from config when no logging configured yet (without force)
-  const context = {abc: 123};
-  const settings = undefined; //getDefaultLoggingSettings(options, logger);
-  const options = {
-    logLevel: logLevel,
-    useLevelPrefixes: !defaultSettings.useLevelPrefixes,
-    useConsoleTrace: !defaultSettings.useConsoleTrace
-  };
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test1');
-
-  t.equal(context.abc, 123, 'context must still be intact');
-  checkEnabledsBasedOnLogLevel(t, context, logLevel);
-  logOneOfEach(context, logLevel);
-
-  // Now override with something else entirely using force (to change away from previous config settings)
-  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
-  const overrideOptions = {
-    logLevel: overrideLogLevel,
-    useLevelPrefixes: defaultSettings.useLevelPrefixes,
-    useConsoleTrace: defaultSettings.useConsoleTrace,
-  };
-  const overrideSettings = getDefaultLoggingSettings(overrideOptions, testLogger(overrideLogLevel, false, t));
-  configureLogging(context, overrideSettings, true);
-
-  // Now do NOT override with logging configuration again (since already configured)
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test2');
-
-  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
-  logOneOfEach(context, overrideLogLevel);
-
-  // Now override with logging configuration using force (by first partially clearing logging from the context)
-  context.error = undefined;
-  configureLoggingIfNotConfigured(context, settings, options, logger, 'test3');
-
-  t.equal(context.abc, 123, 'context must still be intact');
-  checkEnabledsBasedOnLogLevel(t, context, logLevel);
-  logOneOfEach(context, logLevel);
-
-  t.end();
-});
-
-// =====================================================================================================================
-// Test configureLoggingWithSettingsOrOptions with settings
-// =====================================================================================================================
-
-test('configureLoggingWithSettingsOrOptions with settings', t => {
-  const logLevel = defaultSettings.logLevel;
-  const logger = testLogger(logLevel, false, t);
-
-  // Configure default logging when no logging configured yet (without force)
-  const context = {abc: 123};
-  const settings = getDefaultLoggingSettings(undefined, logger);
-  const options = undefined;
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, false);
-
-  t.equal(context.abc, 123, 'context must still be intact');
-  checkEnabledsBasedOnLogLevel(t, context, logLevel);
-  logOneOfEach(context, logLevel);
-
-  // Now override with something else entirely using force (to change away from previous config settings)
-  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
-  const overrideSettings = {
-    logLevel: overrideLogLevel,
-    useLevelPrefixes: !defaultSettings.useLevelPrefixes,
-    useConsoleTrace: !defaultSettings.useConsoleTrace,
-    underlyingLogger: testLogger(overrideLogLevel, false, t)
-  };
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with default logging configuration
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, false);
+  configureLogging(context, settings, options, logger, false);
 
   checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
   logOneOfEach(context, overrideLogLevel);
 
   // Now override with default logging configuration
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, true);
+  configureLogging(context, settings, options, logger, true);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -1018,7 +923,7 @@ test('configureLoggingWithSettingsOrOptions with settings', t => {
 });
 
 // =====================================================================================================================
-// Test configureLoggingWithSettingsOrOptions with options
+// Test configureLogging with options
 // =====================================================================================================================
 
 test('configureLogging with getDefaultLoggingSettings on existing object with test logger & config.logLevel etc.', t => {
@@ -1033,7 +938,7 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
     useLevelPrefixes: !defaultSettings.useLevelPrefixes,
     useConsoleTrace: !defaultSettings.useConsoleTrace
   };
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, false);
+  configureLogging(context, settings, options, logger, false);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -1047,16 +952,16 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
     useConsoleTrace: defaultSettings.useConsoleTrace,
   };
   const overrideSettings = getDefaultLoggingSettings(overrideOptions, testLogger(overrideLogLevel, false, t));
-  configureLogging(context, overrideSettings, true);
+  configureLoggingWithSettings(context, overrideSettings, true);
 
   // Now do NOT override with logging configuration again
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, false);
+  configureLogging(context, settings, options, logger, false);
 
   checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
   logOneOfEach(context, overrideLogLevel);
 
   // Now override with logging configuration using force
-  configureLoggingWithSettingsOrOptions(context, settings, options, logger, true);
+  configureLogging(context, settings, options, logger, true);
 
   t.equal(context.abc, 123, 'context must still be intact');
   checkEnabledsBasedOnLogLevel(t, context, logLevel);
@@ -1065,3 +970,48 @@ test('configureLogging with getDefaultLoggingSettings on existing object with te
   t.end();
 });
 
+// =====================================================================================================================
+// Test configureLogging with settings AND options
+// =====================================================================================================================
+
+test('configureLogging with settings AND options', t => {
+  const logLevel = TRACE;
+  const logger = testLogger(logLevel, false, t);
+
+  // Configure default logging when no logging configured yet (without force)
+  const context = {abc: 123};
+
+  const settings = {logLevel: TRACE, underlyingLogger: logger};
+  const options = getDefaultLoggingSettings(undefined, undefined);
+
+  configureLogging(context, settings, options, undefined, false);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  // Now override with something else entirely using force (to change away from previous config settings)
+  const overrideLogLevel = logLevel !== ERROR ? ERROR : TRACE;
+  const overrideSettings = {
+    logLevel: overrideLogLevel,
+    useLevelPrefixes: !defaultSettings.useLevelPrefixes,
+    useConsoleTrace: !defaultSettings.useConsoleTrace,
+    underlyingLogger: testLogger(overrideLogLevel, false, t)
+  };
+  configureLoggingWithSettings(context, overrideSettings, true);
+
+  // Now do NOT override with default logging configuration
+  configureLogging(context, settings, options, logger, false);
+
+  checkEnabledsBasedOnLogLevel(t, context, overrideLogLevel);
+  logOneOfEach(context, overrideLogLevel);
+
+  // Now override with default logging configuration
+  configureLogging(context, settings, options, logger, true);
+
+  t.equal(context.abc, 123, 'context must still be intact');
+  checkEnabledsBasedOnLogLevel(t, context, logLevel);
+  logOneOfEach(context, logLevel);
+
+  t.end();
+});

@@ -1,4 +1,4 @@
-# logging-utils v2.0.4
+# logging-utils v3.0.0
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -31,10 +31,10 @@ const logging = require('logging-utils');
 
 // Logging configuration functions
 const isLoggingConfigured = logging.isLoggingConfigured;
-const configureLogging = logging.configureLogging;
+const configureLoggingWithSettings = logging.configureLoggingWithSettings;
 const getDefaultLoggingSettings = logging.getDefaultLoggingSettings;
 const configureDefaultLogging = logging.configureDefaultLogging;
-const configureLoggingWithSettingsOrOptions = logging.configureLoggingWithSettingsOrOptions;
+const configureLogging = logging.configureLogging;
 
 // Log level constants
 const ERROR = logging.ERROR;
@@ -55,16 +55,16 @@ configureDefaultLogging(context);
 ```
 * To configure WARN level logging on an existing object
 ```js
-configureLogging(context, {logLevel: WARN});
+configureLoggingWithSettings(context, {logLevel: WARN});
 ```
 * To configure specific logging (WITHOUT overriding any existing logging on context)
 ```js
 const settings = {logLevel: DEBUG, useLevelPrefixes: false, useConsoleTrace: false, underlyingLogger: console};
-configureLogging(context, settings, false);
+configureLoggingWithSettings(context, settings, false);
 ```
 * To configure specific logging (OVERRIDING any existing logging on context!)
 ```js
-configureLogging(context, settings, true);
+configureLoggingWithSettings(context, settings, true);
 ```
 
 * To configure simple default logging on a new object
@@ -85,32 +85,32 @@ configureDefaultLogging(context, options, undefined, true);
 ```js
 const options = { loggingOptions: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
 const loggingSettings = getDefaultLoggingSettings(options.loggingOptions);
-configureLogging(context, loggingSettings);
+configureLoggingWithSettings(context, loggingSettings);
 // or as an alternative to the above 2 lines, just use the following:
 configureDefaultLogging(context, config.loggingOptions);
 
 // Alternatives specifying only optional underlying logger or forceConfiguration 
-configureLogging(context, loggingSettings, console);
-configureLogging(context, loggingSettings, undefined, true);
+configureLoggingWithSettings(context, loggingSettings, console);
+configureLoggingWithSettings(context, loggingSettings, undefined, true);
 ```
 
 * To configure logging from logging options
 ```js
 const options = { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own config object
 const loggingSettings = getDefaultLoggingSettings(options);
-configureLogging(context, loggingSettings);
+configureLoggingWithSettings(context, loggingSettings);
 // or as an alternative to the above 2 lines, just use the following:
 configureDefaultLogging(context, options);
 ```
 
 * To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - WITHOUT overriding any existing logging on context
 ```js
-configureLoggingWithSettingsOrOptions(context, loggingSettings, loggingOptions, underlyingLogger, false);
+configureLogging(context, loggingSettings, loggingOptions, underlyingLogger, false);
 ```
 
 * To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - OVERRIDING any existing logging on context!
 ```js
-configureLoggingWithSettingsOrOptions(context, loggingSettings, loggingOptions, underlyingLogger, true);
+configureLogging(context, loggingSettings, loggingOptions, underlyingLogger, true);
 ```
 
 ### 2. Log messages
@@ -162,6 +162,13 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+
+### 3.0.0
+- Changes to `logging.js` module:
+  - Renamed `configureLogging` function to `configureLoggingWithSettings`
+  - Renamed `configureLoggingWithSettingsOrOptions` function to `configureLogging`
+  - Removed `configureLoggingIfNotConfigured` function
+- Updated `core-functions` dependency to version 2.0.5
 
 ### 2.0.4
 - Changes to `logging.js` module:
