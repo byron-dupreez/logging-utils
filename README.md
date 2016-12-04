@@ -1,4 +1,4 @@
-# logging-utils v3.0.4
+# logging-utils v3.0.5
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -163,6 +163,10 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
 
+### 3.0.5
+- Changed 'Logging was configured without settings or options' warning to use `JSON.stringify` instead of 
+  `Strings.stringify` to avoid verbose logging of all of `console` object's properties and functions
+  
 ### 3.0.4
 - Updated `core-functions` dependency to version 2.0.10
 

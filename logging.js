@@ -18,7 +18,7 @@
 const strings = require('core-functions/strings');
 const isBlank = strings.isBlank;
 const isString = strings.isString;
-const stringify = strings.stringify;
+//const stringify = strings.stringify;
 
 const Objects = require('core-functions/objects');
 
@@ -140,7 +140,7 @@ function configureLogging(target, settings, options, underlyingLogger, forceConf
 
   // Log a warning if no settings and no options were provided and the default settings were applied
   if (!loggingSettingsAvailable && (!options || typeof options !== 'object') && (forceConfiguration || !loggingWasConfigured)) {
-    target.warn(`Logging was configured without settings or options - used default logging configuration (${stringify(loggingSettings)})`);
+    target.warn(`Logging was configured without settings or options - used default logging configuration (${JSON.stringify(loggingSettings)})`);
   }
   return target;
 }
