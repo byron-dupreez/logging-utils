@@ -1,4 +1,4 @@
-# logging-utils v3.0.5
+# logging-utils v3.0.6
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -162,6 +162,9 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+  
+### 3.0.6
+- Updated `core-functions` dependency to version 2.0.11
 
 ### 3.0.5
 - Changed 'Logging was configured without settings or options' warning to use `JSON.stringify` instead of 
