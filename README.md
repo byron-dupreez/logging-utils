@@ -1,4 +1,4 @@
-# logging-utils v3.0.7
+# logging-utils v3.0.8
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -163,6 +163,9 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
   
+### 3.0.8
+- Moved all typedefs from `logging.js` module to new `type-defs.js` module
+
 ### 3.0.7
 - Added `Logging` typedef
 - Changed return types of `configureLogging`, `configureLoggingWithSettings` and `configureDefaultLogging` functions 
