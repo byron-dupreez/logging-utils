@@ -1,4 +1,4 @@
-# logging-utils v3.0.6
+# logging-utils v3.0.7
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -163,6 +163,11 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
   
+### 3.0.7
+- Added `Logging` typedef
+- Changed return types of `configureLogging`, `configureLoggingWithSettings` and `configureDefaultLogging` functions 
+  to new `Logging` type
+ 
 ### 3.0.6
 - Updated `core-functions` dependency to version 2.0.11
 

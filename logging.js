@@ -35,6 +35,19 @@ const INFO = 'info';
 const DEBUG = 'debug';
 const TRACE = 'trace';
 
+/**
+ * @typedef {Object} Logging - logging functionality
+ * @property {Function} error - an error-level logging function
+ * @property {Function} warn - a warn-level logging function
+ * @property {Function} info - an info-level logging function
+ * @property {Function} debug - an debug-level logging function
+ * @property {Function} trace - a trace-level logging function
+ * @property {boolean} warnEnabled - whether warn-level logging is enabled or not
+ * @property {boolean} infoEnabled - whether info-level logging is enabled or not
+ * @property {boolean} debugEnabled - whether debug-level logging is enabled or not
+ * @property {boolean} traceEnabled - whether trace-level logging is enabled or not
+ */
+
 // Exports
 module.exports = {
   // Functions to configure logging
@@ -122,7 +135,7 @@ function isLoggingConfigured(target) {
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
  * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
  * which will override any previously configured logging functionality on the target object
- * @returns {Object} the given target object
+ * @returns {Logging} the given target object with logging functionality configured
  */
 function configureLogging(target, settings, options, underlyingLogger, forceConfiguration) {
   // Check if logging was already configured
@@ -182,7 +195,7 @@ function configureLogging(target, settings, options, underlyingLogger, forceConf
  * @param {LoggingSettings|undefined} [settings] - the optional logging settings to configure
  * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the logging functionality,
  * which will override any previously configured logging functionality on the target object
- * @return {Object} the updated target object
+ * @return {Logging} the updated target object with logging functionality configured
  */
 function configureLoggingWithSettings(target, settings, forceConfiguration) {
   // If forceConfiguration is false check if the given target already has logging functionality configured on it
@@ -252,7 +265,7 @@ function configureLoggingWithSettings(target, settings, forceConfiguration) {
  * @param {Object|undefined} [underlyingLogger] - the optional underlying logger to use to do the actual logging
  * @param {boolean|undefined} [forceConfiguration] - whether or not to force configuration of the default logging
  * functionality, which will override any previously configured logging functionality on the target object
- * @return {Object} the updated target object
+ * @return {Logging} the updated target object with logging functionality configured
  */
 function configureDefaultLogging(target, options, underlyingLogger, forceConfiguration) {
   const settings = getDefaultLoggingSettings(options, underlyingLogger);
