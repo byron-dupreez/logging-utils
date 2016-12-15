@@ -1,4 +1,4 @@
-# logging-utils v3.0.9
+# logging-utils v3.0.10
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -162,6 +162,9 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+  
+### 3.0.10
+- Updated `core-functions` dependency to version 2.0.12
   
 ### 3.0.9
 - Improved `LoggingSettings` & `LoggingOptions` typedefs in `type-defs.js` module
