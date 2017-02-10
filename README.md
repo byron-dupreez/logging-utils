@@ -1,4 +1,4 @@
-# logging-utils v3.0.12
+# logging-utils v4.0.0
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -26,93 +26,98 @@ $ npm i --save logging-utils
 
 1. Require logging-utils
 ```js
-// To use the logging utilties
+// To use the logging utilities
 const logging = require('logging-utils');
+
+// Valid logging levels
+const LogLevel = logging.LogLevel; 
 
 // Logging configuration functions
 const isLoggingConfigured = logging.isLoggingConfigured;
-const configureLoggingWithSettings = logging.configureLoggingWithSettings;
-const getDefaultLoggingSettings = logging.getDefaultLoggingSettings;
-const configureDefaultLogging = logging.configureDefaultLogging;
 const configureLogging = logging.configureLogging;
 
-// Log level constants
-const ERROR = logging.ERROR;
-const WARN = logging.WARN;
-const INFO = logging.INFO;
-const DEBUG = logging.DEBUG;
-const TRACE = logging.TRACE;
+// Convenience logging function
+const log = logging.log;
 ```
 2. Provide a context object on which to configure logging, e.g:
 ```js
-const context = { a: 1, b: 2, c: 3 }; // replace with your own target object to be configured
+const context = {}; // replace with your own target object to be configured
 ```
 3. Configure logging on the context object
 
-* To configure default logging on an existing object:
+* To configure default logging on an existing object (WITHOUT overriding any existing logging on context)
 ```js
-configureDefaultLogging(context);
+configureLogging(context);
+// which is equivalent to:
+configureLogging(context, {logLevel: LogLevel.INFO});
 ```
-* To configure WARN level logging on an existing object
+* To configure WARN level logging on an existing object (WITHOUT overriding any existing logging on context)
 ```js
-configureLoggingWithSettings(context, {logLevel: WARN});
+configureLogging(context, {logLevel: LogLevel.WARN});
 ```
 * To configure specific logging (WITHOUT overriding any existing logging on context)
 ```js
-const settings = {logLevel: DEBUG, useLevelPrefixes: false, useConsoleTrace: false, underlyingLogger: console};
-configureLoggingWithSettings(context, settings, false);
+const settings = {logLevel: LogLevel.DEBUG, useLevelPrefixes: false, useConsoleTrace: false, underlyingLogger: console}; // or your own settings
+configureLogging(context, settings);
+// OR with explicit forceConfiguration false
+configureLogging(context, settings, undefined, false);
 ```
 * To configure specific logging (OVERRIDING any existing logging on context!)
 ```js
-configureLoggingWithSettings(context, settings, true);
+configureLogging(context, settings, undefined, true);
 ```
 
-* To configure simple default logging on a new object
+* To configure default logging on a new object
 ```js
-const log = configureDefaultLogging({});
+const log = configureLogging({});
+```
+* To configure default logging on an existing object with overriding options and forceConfiguration true
+```js
+configureLogging(context, undefined, options, true);
+// Alternatively ...
+configureLogging(context, options, undefined, true);
 ```
 * To configure default logging on an existing object with overriding options, an explicit logger and forceConfiguration true
 ```js
 const options = undefined; // ... or any LoggingOptions you want to use to partially or fully override the default logging settings
-configureDefaultLogging(context, options, console, true);
-
-// Alternatives specifying only underlying logger or forceConfiguration 
-configureDefaultLogging(context, options, console);
-configureDefaultLogging(context, options, undefined, true);
+configureLogging(context, {underlyingLogger: console}, options);
+const CustomLogger = {/* ... */}; // implement your own custom logger if required
+configureLogging(context, {underlyingLogger: CustomLogger}, options, true);
 ```
 
-* To configure logging from a config object (or file) with logging options under config.loggingOptions 
+* To configure logging from options
 ```js
-const options = { loggingOptions: { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false } }; // replace with your own config object
-const loggingSettings = getDefaultLoggingSettings(options.loggingOptions);
-configureLoggingWithSettings(context, loggingSettings);
-// or as an alternative to the above 2 lines, just use the following:
-configureDefaultLogging(context, config.loggingOptions);
-
-// Alternatives specifying only optional underlying logger or forceConfiguration 
-configureLoggingWithSettings(context, loggingSettings, console);
-configureLoggingWithSettings(context, loggingSettings, undefined, true);
-```
-
-* To configure logging from logging options
-```js
-const options = { logLevel: DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own config object
-const loggingSettings = getDefaultLoggingSettings(options);
-configureLoggingWithSettings(context, loggingSettings);
-// or as an alternative to the above 2 lines, just use the following:
-configureDefaultLogging(context, options);
+const options = { logLevel: LogLevel.DEBUG, useLevelPrefixes: true, useConsoleTrace: false }; // replace with your own options
+configureLogging(context, undefined, options);
+// OR just ...
+configureLogging(context, options);
 ```
 
 * To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - WITHOUT overriding any existing logging on context
 ```js
-configureLogging(context, loggingSettings, loggingOptions, underlyingLogger, false);
+configureLogging(context, settings, options);
+// OR with explicit forceConfiguration false ...
+configureLogging(context, settings, options, false);
 ```
 
 * To configure logging from EITHER logging settings OR logging options (OR defaults if neither) - OVERRIDING any existing logging on context!
 ```js
-configureLogging(context, loggingSettings, loggingOptions, underlyingLogger, true);
+configureLogging(context, settings, options, true);
 ```
 
+* To **OVERRIDE** any pre-configured `logLevel` setting or option during runtime configuration, set a logging level on 
+ the environment variable named by the `envLogLevelName` setting, which is also configurable and defaults to `'LOG_LEVEL'`. 
+ Any valid `logLevel` found with `process.env[envLogLevelName]` will take precedence over any other `logLevel` setting or option.
+```js
+// For unit testing, set the `LOG_LEVEL` environment variable programmatically
+process.env.LOG_LEVEL = LogLevel.DEBUG;
+
+// Alternatively, if you configured your own `envLogLevelName` as 'MyLogLevel', e.g.
+configureLogging(context, {envLogLevelName: 'MyLogLevel'});
+// then for unit testing, set your `MyLogLevel` environment variable programmatically
+process.env.MyLogLevel = LogLevel.TRACE;
+```  
+  
 ### 2. Log messages
 
 * To log errors:
@@ -156,12 +161,49 @@ context.trace('Trace message 1');
 if (context.traceEnabled) context.trace('Trace message 2');
 ```
 
+* To log messages at a specified log level (using the `log` method):
+```js
+// To log a message at LogLevel.TRACE (or do nothing when trace messages are disabled)
+context.log(LogLevel.ERROR, 'Error message 1', new Error('Boom').stack);
+
+// Note that this will also work with console, but you won't get any suppression according to log level
+console.log(LogLevel.TRACE, 'Trace message 1');
+```
+
+* To log messages at a specified log level (using the `log` function):
+```js
+// Alternatively using log function
+log(context, LogLevel.DEBUG, 'Debug message 1');
+
+// Note that this will also work with console (and undefined), but you won't get any suppression according to log level
+log(console, LogLevel.WARN, 'Warn message 1');
+log(undefined, LogLevel.ERROR, 'Error message 1', new Error('Boom 2').stack);
+```
+
 ## Unit tests
 This module's unit tests were developed with and must be run with [tape](https://www.npmjs.com/package/tape). The unit tests have been tested on [Node.js v4.3.2](https://nodejs.org/en/blog/release/v4.3.2/).  
 
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+  
+### 4.0.0
+- Major changes to and simplification of `logging.js` API (NOT BACKWARD COMPATIBLE!):
+  - Removed `underlyingLogger` parameter from `configureLogging` function, which was ignored when `settings` were 
+    provided and was also redundant, since it can be set via the `settings` parameter
+  - Removed redundant `configureLoggingWithSettings`, `configureDefaultLogging` and `getDefaultLoggingSettings` functions
+  - Replaced `ERROR`, `WARN`, `INFO`, `DEBUG` and `TRACE` constants with properties in new `LogLevel` constant to 
+    simplify import & usage and changed their values to uppercase for consistency
+  - Removed `toValidLogLevelOrDefault` function
+  - Renamed `Logging` typedef to `Logger`
+  - Added additional `log` method to the target object during `configureLogging` to enable logging at a specified level
+  - Added `log` function, which delegates to new `log` method to enable logging at a specified level
+  - Exported `isValidLogLevel` and new `cleanLogLevel` functions
+- Added an `envLogLevelName` setting to enable configuration of the name of the environment variable in which to look 
+  for a logLevel on `process.env` (defaults to 'LOG_LEVEL' if undefined)
+- Enabled overriding of configured logLevel via `process.env[envLogLevelName]`, where `envLogLevelName` refers to the 
+  configured name of the environment variable in which to look for a logLevel on `process.env`
+- Updated `core-functions` dependency to version 3.0.0
   
 ### 3.0.12
 - Updated `core-functions` dependency to version 2.0.14

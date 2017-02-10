@@ -1,7 +1,0 @@
-{
-  "loggingOptions": {
-    "logLevel": "info",
-    "useLevelPrefixes": true,
-    "useConsoleTrace": false
-  }
-}
