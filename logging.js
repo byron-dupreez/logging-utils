@@ -53,7 +53,10 @@ const isNotBlank = Strings.isNotBlank;
 const isString = Strings.isString;
 const stringify = Strings.stringify;
 
-const Objects = require('core-functions/objects');
+const copying = require('core-functions/copying');
+const copy = copying.copy;
+const merging = require('core-functions/merging');
+const merge = merging.merge;
 
 function noop() {
 }
@@ -173,12 +176,12 @@ function configureLogging(target, settings, options, forceConfiguration) {
 
   // Resolve the logging settings to use by merging the clean options (if any) into the clean settings (if any) without
   // replacing any existing clean settings
-  const loggingSettings = settings ? (options ? Objects.merge(options, settings) : settings) : options;
+  const loggingSettings = settings ? (options ? merge(options, settings) : settings) : options;
 
   // Finalise the logging settings by using the default options to fill in any missing settings
   const defaultOptions = getDefaultLoggingOptions();
   const loggingSettingsWithDefaults = loggingSettings ?
-    Objects.merge(defaultOptions, loggingSettings) : defaultOptions;
+    merge(defaultOptions, loggingSettings) : defaultOptions;
 
   // Configure logging with the finalised logging settings
   _configureLogging(target, loggingSettingsWithDefaults);
@@ -288,7 +291,7 @@ function loadDefaultLoggingOptions() {
  */
 function getDefaultLoggingOptions() {
   const defaultOptions = loadDefaultLoggingOptions();
-  return defaultOptions ? Objects.merge(defaults, defaultOptions) : Objects.copy(defaults);
+  return defaultOptions ? merge(defaults, defaultOptions) : copy(defaults);
 }
 
 /**
@@ -300,7 +303,7 @@ function getDefaultLoggingOptions() {
 function toCleanSettingsOrOptions(optionsOrSettings) {
   if (!optionsOrSettings || typeof optionsOrSettings !== 'object') return undefined;
 
-  const cleaned = optionsOrSettings ? Objects.copy(optionsOrSettings) : {};
+  const cleaned = optionsOrSettings ? copy(optionsOrSettings) : {};
 
   if (isValidLogLevel(cleaned.logLevel)) {
     cleaned.logLevel = cleanLogLevel(cleaned.logLevel);

@@ -1,4 +1,4 @@
-# logging-utils v4.0.0
+# logging-utils v4.0.1
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -186,6 +186,9 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+
+### 4.0.1
+- Updated `core-functions` dependency to version 3.0.2
   
 ### 4.0.0
 - Major changes to and simplification of `logging.js` API (NOT BACKWARD COMPATIBLE!):
