@@ -1,4 +1,4 @@
-# logging-utils v4.0.2
+# logging-utils v4.0.3
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -186,6 +186,10 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+
+### 4.0.3
+- Upgraded to Node 6.10.3
+- Updated `core-functions` dependency to version 3.0.4
 
 ### 4.0.2
 - Updated `core-functions` dependency to version 3.0.3
