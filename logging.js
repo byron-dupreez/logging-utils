@@ -123,7 +123,7 @@ module.exports = {
  * @return {*} true if configured; otherwise false
  */
 function isLoggingConfigured(target) {
-  return isBoolean(target.warnEnabled) && isBoolean(target.infoEnabled) && isBoolean(target.debugEnabled)
+  return target && isBoolean(target.warnEnabled) && isBoolean(target.infoEnabled) && isBoolean(target.debugEnabled)
     && isBoolean(target.traceEnabled) && typeof target.error === 'function' && typeof target.warn === 'function'
     && typeof target.info === 'function' && typeof target.debug === 'function' && typeof target.trace === 'function';
 }
