@@ -14,5 +14,8 @@
   "repository": "https://github.com/byron-dupreez/logging-utils",
   "dependencies": {
     "core-functions": "2.0.15"
+  },
+  "devDependencies": {
+    "tape": "^4.7.0"
   }
 }

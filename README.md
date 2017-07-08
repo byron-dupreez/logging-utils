@@ -1,4 +1,4 @@
-# logging-utils v3.0.13
+# logging-utils v3.0.14
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -163,6 +163,9 @@ See the [package source](https://github.com/byron-dupreez/logging-utils) for mor
 
 ## Changes
   
+### 3.0.14
+- Moved test devDependencies to package.json & removed test/package.json
+
 ### 3.0.13
 - Updated `core-functions` dependency to version 2.0.15
 
