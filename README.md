@@ -1,4 +1,4 @@
-# logging-utils v4.0.6
+# logging-utils v4.0.7
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -186,6 +186,10 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
+
+### 4.0.7
+- Moved test devDependencies to package.json & removed test/package.json
+- Updated `core-functions` dependency to version 3.0.7
 
 ### 4.0.6
 - Changed `isLoggingConfigured` function to check for non-defined `target` argument
