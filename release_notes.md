@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.9
+- Updated `core-functions` dependency to version 3.0.9
+
 ### 4.0.8
 - Updated `core-functions` dependency to version 3.0.8
 
