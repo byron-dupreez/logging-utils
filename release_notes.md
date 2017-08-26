@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.11
+- Updated `core-functions` dependency to version 3.0.11
+
 ### 4.0.10
 - Updated `core-functions` dependency to version 3.0.10
 
