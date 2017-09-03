@@ -1,5 +1,9 @@
 ## Changes
 
+### 4.0.12
+- Changed all exports to modifications of the default `exports` object instead of replacing the default object
+- Updated `core-functions` dependency to version 3.0.13
+
 ### 4.0.11
 - Updated `core-functions` dependency to version 3.0.11
 

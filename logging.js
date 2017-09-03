@@ -1,5 +1,19 @@
 'use strict';
 
+// Dependencies
+const strings = require('core-functions/strings');
+const isNotBlank = strings.isNotBlank;
+const isString = strings.isString;
+const stringify = strings.stringify;
+
+const copying = require('core-functions/copying');
+const copy = copying.copy;
+const merging = require('core-functions/merging');
+const merge = merging.merge;
+
+const booleans = require('core-functions/booleans');
+const isBoolean = booleans.isBoolean;
+
 /**
  * Utilities to configure simple log-level based console logging.
  *
@@ -46,23 +60,18 @@
  * @module logging-utils/logging
  * @author Byron du Preez
  */
-
-// Dependencies
-const Strings = require('core-functions/strings');
-const isNotBlank = Strings.isNotBlank;
-const isString = Strings.isString;
-const stringify = Strings.stringify;
-
-const copying = require('core-functions/copying');
-const copy = copying.copy;
-const merging = require('core-functions/merging');
-const merge = merging.merge;
+// Exports
+exports.isLoggingConfigured = isLoggingConfigured;
+exports.configureLogging = configureLogging;
+exports.getDefaultLoggingOptions = getDefaultLoggingOptions;
+exports.log = log;
+exports.isValidLogLevel = isValidLogLevel;
+exports.cleanLogLevel = cleanLogLevel;
+exports.isMinimumViableLogger = isMinimumViableLogger;
+// exports.FOR_TESTING_ONLY = {loadDefaultLoggingOptions, toLoggingSettingsWithDefaults}
 
 function noop() {
 }
-
-const booleans = require('core-functions/booleans');
-const isBoolean = booleans.isBoolean;
 
 /**
  * An enum for the various logging levels supported
@@ -77,6 +86,7 @@ const LogLevel = {
   TRACE: 'TRACE'
 };
 Object.freeze(LogLevel);
+exports.LogLevel = LogLevel;
 
 /**
  * The last-resort, default options to fallback to during configuration to fill in any missing settings
@@ -89,33 +99,6 @@ const defaults = {
   useConsoleTrace: false
 };
 
-// Exports
-module.exports = {
-  /** Valid log levels */
-  LogLevel: LogLevel,
-
-  /** Returns true, if the given target already has logging functionality configured on it; otherwise returns false. */
-  isLoggingConfigured: isLoggingConfigured,
-
-  /** Configures a target object with logging functionality using given logging settings (if any) or using default logging settings partially overridden by given logging options (if any) */
-  configureLogging: configureLogging,
-
-  /** Returns a clean and complete copy of the default logging options */
-  getDefaultLoggingOptions: getDefaultLoggingOptions,
-
-  /** A convenience function that delegates the logging to the log method of the given logger or of console */
-  log: log,
-
-  isValidLogLevel: isValidLogLevel,
-  cleanLogLevel: cleanLogLevel,
-  isMinimumViableLogger: isMinimumViableLogger
-
-  // FOR_TESTING_ONLY: {
-  //   /** Loads a clean, but potentially incomplete, copy of the default logging options from the local default-options.json file */
-  //   loadDefaultLoggingOptions: loadDefaultLoggingOptions,
-  //   toLoggingSettingsWithDefaults: toLoggingSettingsWithDefaults
-  // }
-};
 
 /**
  * Returns true, if the given target already has logging functionality configured on it; otherwise returns false.
@@ -271,7 +254,7 @@ function _configureLogging(target, settings) {
   target.trace = trace;
   target.log = generateLogFunction(log, logger);
 
-  target.info(`Logging configured with level ${logLevel}, with${useLevelPrefixes ? '' : 'out'} prefixes, with env log level name '${envLogLevelName}' & with${useConsoleTrace ? '' : 'out'} console.trace`);
+  target.debug(`Logging configured with level ${logLevel}, with${useLevelPrefixes ? '' : 'out'} prefixes, with env log level name '${envLogLevelName}' & with${useConsoleTrace ? '' : 'out'} console.trace`);
 
   return target;
 }
@@ -405,7 +388,7 @@ function log(logger, data) {
   if (logger && typeof logger.log === 'function') {
     logger.log.apply(logger, args);
   } else if (logger && typeof logger.info === 'function') {
-      // If a logger was provided & it has a log method, then use it
+    // If a logger was provided & it has a log method, then use it
     logger.info.apply(logger, args);
   } else {
     // otherwise use console
