@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.13
+- Added dummy first export (`exports._ = '_'; //IDE workaround`) to `logging` module as a temporary workaround for IDE issue
+
 ### 4.0.12
 - Changed all exports to modifications of the default `exports` object instead of replacing the default object
 - Updated `core-functions` dependency to version 3.0.13

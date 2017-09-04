@@ -60,6 +60,7 @@ const isBoolean = booleans.isBoolean;
  * @module logging-utils/logging
  * @author Byron du Preez
  */
+exports._ = '_'; //IDE workaround
 // Exports
 exports.isLoggingConfigured = isLoggingConfigured;
 exports.configureLogging = configureLogging;
