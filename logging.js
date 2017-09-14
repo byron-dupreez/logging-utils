@@ -38,7 +38,7 @@ const isBoolean = booleans.isBoolean;
  *
  * - Then later use the configured object to do logging, for example:
  *    let err = new Error('Some arbitrary error');
- *    context.error('Insert error message here', err.stack);
+ *    context.error('Insert error message here', err);
  *    if (context.warnEnabled) context.warn('Insert warning here');
  *    context.info('FYI');
  *    if (log.debugEnabled) context.debug('Insert debug message here');
@@ -51,7 +51,7 @@ const isBoolean = booleans.isBoolean;
  *
  * - Then later use the configured object to do logging, for example:
  *    let err = new Error('Some arbitrary error');
- *    log.error('Insert error message here', err.stack);
+ *    log.error('Insert error message here', err);
  *    log.warn('Insert warning here');
  *    if (log.infoEnabled) log.info('FYI');
  *    log.debug('Insert debug message here');

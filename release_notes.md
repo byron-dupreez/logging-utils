@@ -1,5 +1,9 @@
 ## Changes
 
+### 4.0.14
+- Replaced all logging of `error.stack` with logging of just the error
+- Updated `core-functions` dependency to version 3.0.15
+
 ### 4.0.13
 - Added dummy first export (`exports._ = '_'; //IDE workaround`) to `logging` module as a temporary workaround for IDE issue
 
