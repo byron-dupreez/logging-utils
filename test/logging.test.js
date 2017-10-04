@@ -19,7 +19,7 @@ const getDefaultLoggingOptions = logging.getDefaultLoggingOptions;
 const log = logging.log;
 const isMinimumViableLogger = logging.isMinimumViableLogger;
 
-const booleans = require('core-functions/booleans');
+// const booleans = require('core-functions/booleans');
 //const isBoolean = booleans.isBoolean;
 
 const strings = require('core-functions/strings');
@@ -86,7 +86,7 @@ function testLogger(logLevel, useConsole, testPrefix, t) {
 let counter = 1;
 
 function logOneOfEach(logger, logLevel) {
-  logger.error(`*** Error message ${counter} (at level ${logLevel})`, '***'); //, new Error('Boom').stack);
+  logger.error(`*** Error message ${counter} (at level ${logLevel})`, '***'); //, new Error('Boom'));
   logger.warn(`*** Warn message ${counter} (at level ${logLevel})`, '***');
   logger.info(`*** Info message ${counter} (at level ${logLevel})`, '***');
   logger.debug(`*** Debug message ${counter} (at level ${logLevel})`, '***');
@@ -112,6 +112,60 @@ function logOneOfEachUsingLogFunction(logger, logLevel, loggerDesc) {
   log(logger, LogLevel.DEBUG, `*** log(${loggerDesc}, DEBUG) message ${counter} (at level ${logLevel})`, '***');
   log(logger, LogLevel.TRACE, `*** log(${loggerDesc}, TRACE) message ${counter} (at level ${logLevel})`, '***');
   log(logger, '<<< %s %s >>>', `*** log(${loggerDesc}, "<<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  ++counter;
+}
+
+function logOneOfEachUsingLogMethod2(logger, logLevel) {
+  logger.log(`${LogLevel.ERROR} <<< %s %s >>>`, `*** Log "ERROR <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  logger.log(`${LogLevel.WARN} <<< %s %s >>>`, `*** Log "WARN <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  logger.log(`${LogLevel.INFO} <<< %s %s >>>`, `*** Log "INFO <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  logger.log(`${LogLevel.DEBUG} <<< %s %s >>>`, `*** Log "DEBUG <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  logger.log(`${LogLevel.TRACE} <<< %s %s >>>`, `*** Log "TRACE <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  logger.log('<<< %s %s >>>', `*** Log "<<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  ++counter;
+}
+
+function logOneOfEachUsingLogFunction2(logger, logLevel, loggerDesc) {
+  log(logger, `${LogLevel.ERROR} <<< %s %s >>>`, `*** log(${loggerDesc}, "ERROR <<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  log(logger, `${LogLevel.WARN} <<< %s %s >>>`, `*** log(${loggerDesc}, "WARN <<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  log(logger, `${LogLevel.INFO} <<< %s %s >>>`, `*** log(${loggerDesc}, "INFO <<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  log(logger, `${LogLevel.DEBUG} <<< %s %s >>>`, `*** log(${loggerDesc}, "DEBUG <<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  log(logger, `${LogLevel.TRACE} <<< %s %s >>>`, `*** log(${loggerDesc}, "TRACE <<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  log(logger, '<<< %s %s >>>', `*** log(${loggerDesc}, "<<< %s %s >>>") message ${counter} (at level ${logLevel})`, '***');
+  ++counter;
+}
+
+function logOneOfEach3(logger, logLevel) {
+  const error = logger.error;
+  const warn = logger.warn;
+  const info = logger.info;
+  const debug = logger.debug;
+  const trace = logger.trace;
+  // Ensure previously bound, by calling without `logger.`
+  error(`*** Error message ${counter} (at level ${logLevel})`, '***'); //, new Error('Boom'));
+  warn(`*** Warn message ${counter} (at level ${logLevel})`, '***');
+  info(`*** Info message ${counter} (at level ${logLevel})`, '***');
+  debug(`*** Debug message ${counter} (at level ${logLevel})`, '***');
+  trace(`*** Trace message ${counter} (at level ${logLevel})`, '***');
+  logOneOfEachUsingLogMethod3(logger, logLevel);
+  //++counter;
+}
+
+function logOneOfEachUsingLogMethod3(logger, logLevel) {
+  const log = logger.log;
+  // Ensure previously bound, by calling without `logger.`
+  log(LogLevel.ERROR, `*** Log ERROR message ${counter} (at level ${logLevel})`, '***');
+  log(LogLevel.WARN, `*** Log WARN message ${counter} (at level ${logLevel})`, '***');
+  log(LogLevel.INFO, `*** Log INFO message ${counter} (at level ${logLevel})`, '***');
+  log(LogLevel.DEBUG, `*** Log DEBUG message ${counter} (at level ${logLevel})`, '***');
+  log(LogLevel.TRACE, `*** Log TRACE message ${counter} (at level ${logLevel})`, '***');
+  log('<<< %s %s >>>', `*** Log "<<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+
+  log(`${LogLevel.ERROR} <<< %s %s >>>`, `*** Log "ERROR <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  log(`${LogLevel.WARN} <<< %s %s >>>`, `*** Log "WARN <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  log(`${LogLevel.INFO} <<< %s %s >>>`, `*** Log "INFO <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  log(`${LogLevel.DEBUG} <<< %s %s >>>`, `*** Log "DEBUG <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
+  log(`${LogLevel.TRACE} <<< %s %s >>>`, `*** Log "TRACE <<< %s %s >>>" message ${counter} (at level ${logLevel})`, '***');
   ++counter;
 }
 
@@ -1283,6 +1337,42 @@ test('log method and log function', t => {
   t.end();
 });
 
+test('log method and log function with first argument containing MORE than just a log level', t => {
+  const context = {abc: 123};
+  const logLevelNames = Object.getOwnPropertyNames(LogLevel);
+  for (let i = 0; i < logLevelNames.length; ++i) {
+    const logLevel = LogLevel[logLevelNames[i]];
+    const logger = testLogger(logLevel, false, 'TEST', t);
+
+    // Configure default logging when no logging configured yet (without force)
+    const settings = {logLevel: logLevel, underlyingLogger: logger};
+    configureLogging(context, settings, undefined, true);
+
+    t.equal(context._underlyingLogger, logger, 'context._underlyingLogger must be test logger');
+
+    checkEnabledsBasedOnLogLevel(t, context, logLevel);
+
+    // Use log method to log a message at each level
+    logOneOfEachUsingLogMethod2(context, logLevel);
+
+    // Use log function on context to log a message at each level
+    logOneOfEachUsingLogFunction2(context, logLevel, 'context');
+
+    // // Use log function on console to log a message at each level
+    // logOneOfEachUsingLogFunction2(console, logLevel, 'console');
+
+    // // Use log function on undefined to log a message at each level
+    // logOneOfEachUsingLogFunction2(undefined, logLevel, 'undefined');
+  }
+  log();
+
+  t.end();
+});
+
+// =====================================================================================================================
+// Minimum viable loggers
+// =====================================================================================================================
+
 test('Minimum viable loggers', t => {
   const logLevelNames = Object.getOwnPropertyNames(LogLevel);
   for (let i = 0; i < logLevelNames.length; ++i) {
@@ -1417,6 +1507,33 @@ test('Minimum viable loggers', t => {
     t.equal(context._underlyingLogger, console, 'context._underlyingLogger must be console');
     logOneOfEachUsingLogMethod(context, logLevel);
   }
+  log();
+  t.end();
+});
 
+// =====================================================================================================================
+// error, warn, info, debug, trace & log methods and log functions must be bound
+// =====================================================================================================================
+
+test('error, warn, info, debug, trace & log methods and log functions must be bound', t => {
+
+  const context = {abc: 123};
+  const logLevelNames = Object.getOwnPropertyNames(LogLevel);
+  for (let i = 0; i < logLevelNames.length; ++i) {
+    const logLevel = LogLevel[logLevelNames[i]];
+    const logger = testLogger(logLevel, false, 'TEST_BOUND_', t);
+
+    // Configure default logging when no logging configured yet (without force)
+    const settings = {logLevel: logLevel, underlyingLogger: logger};
+    configureLogging(context, settings, undefined, true);
+
+    t.equal(context._underlyingLogger, logger, 'context._underlyingLogger must be test logger');
+
+    checkEnabledsBasedOnLogLevel(t, context, logLevel);
+
+    // Use log method to log a message at each level
+    logOneOfEach3(context, logLevel);
+  }
+  log();
   t.end();
 });

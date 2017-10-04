@@ -4,6 +4,7 @@
 const strings = require('core-functions/strings');
 const isNotBlank = strings.isNotBlank;
 const isString = strings.isString;
+const trim = strings.trim;
 const stringify = strings.stringify;
 
 const copying = require('core-functions/copying');
@@ -13,6 +14,8 @@ const merge = merging.merge;
 
 const booleans = require('core-functions/booleans');
 const isBoolean = booleans.isBoolean;
+
+const levelPrefixedRegex = /\s*(ERROR|WARN|INFO|DEBUG|TRACE|LOG)(?:$|([^A-Za-z]+.*))/;
 
 /**
  * Utilities to configure simple log-level based console logging.
@@ -199,29 +202,11 @@ function _configureLogging(target, settings) {
     throw new Error(`FATAL: Cannot configure logging with an underlying logger that has neither a log method nor an info method - logger (${stringify(logger)})`);
   }
   if (!hasLogMethod) {
-    console.warn('WARNING - The configured underlying logger has NO log method - falling back to using its info method, which is not a complete replacement!');
+    console.warn('WARNING - The configured underlying logger has NO log method - falling back to using its info method');
   }
   if (!hasInfoMethod) {
     console.warn('WARNING - The configured underlying logger has NO info method - falling back to using its log method');
   }
-  // Resolve logger's info method, but fallback to using logger.log if it has no logger.info
-  const loggerInfo = usingConsole ? console.info : hasInfoMethod ? logger.info : logger.log; //hasLogMethod ? logger.log : undefined;
-
-  // Resolve logger's warn method, but fallback to using logger.error if it has no logger.warn method
-  const loggerWarn = usingConsole ? console.warn : typeof logger.warn === 'function' ? logger.warn : logger.error;
-
-  // Resolve logger's debug method, but fallback to using loggerInfo if it has no logger.debug method
-  const loggerDebug = usingConsole ? console.info : typeof logger.debug === 'function' ? logger.debug : loggerInfo;
-
-  // Resolve logger's trace method, but fallback to using loggerDebug if it has no logger.trace method
-  const loggerTrace = usingConsole ? useConsoleTrace ? console.trace : console.info :
-    typeof logger.trace === "function" ? logger.trace : loggerDebug;
-
-  // Resolve logger's log method, but fallback to using loggerInfo if it has no logger.log method, which is NOT technically a
-  // proper replacement for a log method, but nevertheless ...
-  const loggerLog = hasLogMethod ? logger.log : loggerInfo;
-
-  const usingConsoleTrace = usingConsole && useConsoleTrace;
 
   // Use log level to determine which levels are enabled
   const traceEnabled = logLevel === LogLevel.TRACE;
@@ -229,17 +214,33 @@ function _configureLogging(target, settings) {
   const infoEnabled = debugEnabled || logLevel === LogLevel.INFO;
   const warnEnabled = infoEnabled || logLevel === LogLevel.WARN;
 
-  // Set up the appropriate function to use for logging at each level
-  const error = useLevelPrefixes ? withPrefix(logger.error, 'ERROR', logger) : logger.error;
-  const warn = warnEnabled ? useLevelPrefixes ? withPrefix(loggerWarn, 'WARN', logger) : loggerWarn : noop;
-  const info = infoEnabled ? useLevelPrefixes ? withPrefix(loggerInfo, 'INFO', logger) : loggerInfo : noop;
-  const debug = debugEnabled ? useLevelPrefixes ? withPrefix(loggerDebug, 'DEBUG', logger) : loggerDebug : noop;
-  // Note that we skip adding a prefix when using console.trace, since it already includes its own prefix 'Trace: '
-  const trace = traceEnabled ? useLevelPrefixes && !usingConsoleTrace ? withPrefix(loggerTrace, 'TRACE', logger) : loggerTrace : noop;
+  // Resolve logger's error method
+  const error = resolveLoggingFunction(logger, 'error', useLevelPrefixes, 'ERROR');
+
+  // Resolve logger's warn method, but fallback to using logger.error if it has no logger.warn method
+  const warnFnName = usingConsole ? 'warn' : typeof logger.warn === 'function' ? 'warn' : 'error';
+  const warn = warnEnabled ? resolveLoggingFunction(logger, warnFnName, useLevelPrefixes, 'WARN') : noop;
+
+  // Resolve logger's info method, but fallback to using logger.log if it has no logger.info
+  const infoFnName = usingConsole ? 'info' : typeof logger.info === 'function' ? 'info' : 'log';
+  const info = infoEnabled ? resolveLoggingFunction(logger, infoFnName, useLevelPrefixes, 'INFO') : noop;
+
+  // Resolve logger's debug method, but fallback to using infoFnName if it has no logger.debug method
+  const debugFnName = usingConsole ? 'info' : typeof logger.debug === 'function' ? 'debug' : infoFnName;
+  const debug = debugEnabled ? resolveLoggingFunction(logger, debugFnName, useLevelPrefixes, 'DEBUG') : noop;
+
+  // Resolve logger's trace method, but fallback to using debugFnName if it has no logger.trace method
+  const traceFnName = usingConsole ? useConsoleTrace ? 'trace' : 'info' :
+    typeof logger.trace === 'function' ? 'trace' : debugFnName;
+  const trace = traceEnabled ? resolveLoggingFunction(logger, traceFnName, useLevelPrefixes, 'TRACE') : noop;
+
+  // Resolve logger's log method, but fallback to using logger.info if it has no logger.log method, which is NOT
+  // technically a proper replacement for a log method, but nevertheless ...
   // To enable the underlying logger's log method's output to ALSO be suppressed, treat it as if it logs at INFO level
   // (i.e. it will be suppressed if infoEnabled is false), but prefix it with 'LOG' instead of 'INFO' (to distinguish it
   // from INFO logging output) when useLevelPrefixes is true
-  const log = infoEnabled ? useLevelPrefixes ? withPrefix(loggerLog, 'LOG', logger) : loggerLog : noop;
+  const logFnName = usingConsole ? 'log' : typeof logger.log === 'function' ? 'log' : infoFnName;
+  const log = infoEnabled ? resolveLoggingFunction(logger, logFnName, useLevelPrefixes, 'LOG') : noop;
 
   // Add the logging functionality to the given target object
   target.logLevel = logLevel; // for info and testing purposes
@@ -253,7 +254,7 @@ function _configureLogging(target, settings) {
   target.info = info;
   target.debug = debug;
   target.trace = trace;
-  target.log = generateLogFunction(log, logger);
+  target.log = extendLogFunction(target, log);
 
   target.debug(`Logging configured with level ${logLevel}, with${useLevelPrefixes ? '' : 'out'} prefixes, with env log level name '${envLogLevelName}' & with${useConsoleTrace ? '' : 'out'} console.trace`);
 
@@ -341,6 +342,19 @@ function cleanLogLevel(logLevel) {
 }
 
 /**
+ * Extracts the log level prefix (if any) and returns it and the rest of the input; otherwise returns undefined and the
+ * original input.
+ * @param {string|*} input - the input to split
+ * @returns {[(LogLevel|undefined), (string|*)]} an array containing the log level (if extracted) or undefined followed
+ * by the rest of the input trimmed (if level was extracted) or the original input
+ */
+function extractLogLevelAndRest(input) {
+  const match = levelPrefixedRegex.exec(input);
+  if (!match) return [undefined, input];
+  return [match[1], trim(match[2])];
+}
+
+/**
  * Checks whether the given logger is either console or a minimum viable logger-like object, which means that it must
  * have AT LEAST a `log` method and an `error` method.
  * @param {Logger|BasicLogger|*} logger - the logger to be checked
@@ -351,22 +365,32 @@ function isMinimumViableLogger(logger) {
 }
 
 /**
- * Returns a function which wraps the given logFn in order to prepend the given level prefix to its first argument when
- * invoked.
- * @param {Function} logFn the logging function to wrap (e.g. console.log, console.error, ...)
- * @param {string} logLevelPrefix the prefix to prepend
- * @param {Logger|BasicLogger} logger - the underlying logger from which the logFn originates
- * @return {logWithPrefix} a prefix-prepending function that delegates to the given logFn
+ * Resolves the given logger's named logging function, binds it to the given logger and then either returns the bound
+ * function (if `useLogLevelPrefix` is false) or wraps it in a function that will also prepend the given
+ * `logLevelPrefix` to any first argument before invoking the bound function.
+ * @param {Logger|BasicLogger} logger - the underlying logger from which the logging function originates
+ * @param {string} loggingFnName - the name of the logger's logging function to use
+ * @param {boolean} useLogLevelPrefix - whether the returned function must prepend the given log-level prefix to its first argument or not
+ * @param {string} logLevelPrefix - the prefix to prepend
+ * @return {logWithPrefix} a bound and possibly prefix pre-pending logging function that delegates to the named & bound logging function
  */
-function withPrefix(logFn, logLevelPrefix, logger) {
+function resolveLoggingFunction(logger, loggingFnName, useLogLevelPrefix, logLevelPrefix) {
+  // Bind the relevant log function to its appropriate logger
+  const loggingFn = logger[loggingFnName].bind(logger);
+
+  // Note that we skip adding a prefix when using console.trace, since it already includes its own prefix 'Trace: '
+  if (!useLogLevelPrefix || (logger === console && loggingFnName === 'trace')) {
+    return loggingFn;
+  }
+
   function logWithPrefix() {
-    if (arguments && arguments.length > 0) {
-      const arg1 = arguments[0];
-      if (arg1 && isString(arg1) && !arg1.startsWith(logLevelPrefix)) {
-        arguments[0] = `${logLevelPrefix} ${arg1}`;
+    if (arguments.length > 0) {
+      const arg0 = arguments[0];
+      if (!isString(arg0) || !arg0.startsWith(logLevelPrefix)) {
+        arguments[0] = `${logLevelPrefix} ${arg0 instanceof Error && arg0.stack ? arg0.stack : arg0}`;
       }
     }
-    return logFn.apply(logger, arguments);
+    return loggingFn.apply(null, arguments); // prior bind takes precedence over any apply (so just apply with null)
   }
 
   return logWithPrefix;
@@ -381,6 +405,10 @@ function withPrefix(logFn, logLevelPrefix, logger) {
 function log(logger, data) {
   // Collect all arguments other than logger
   const len = arguments.length;
+  if (len <= 0) {
+    console.log();
+    return;
+  }
   const args = new Array(len - 1);
   for (let i = 1; i < len; ++i) {
     args[i - 1] = arguments[i];
@@ -389,7 +417,7 @@ function log(logger, data) {
   if (logger && typeof logger.log === 'function') {
     logger.log.apply(logger, args);
   } else if (logger && typeof logger.info === 'function') {
-    // If a logger was provided & it has a log method, then use it
+    // If a logger was provided & it has a info method, then use it
     logger.info.apply(logger, args);
   } else {
     // otherwise use console
@@ -398,60 +426,79 @@ function log(logger, data) {
 }
 
 /**
- * Generates a log function that will delegate the logging to the appropriate logging function based on a given log
- * level (if its valid) and otherwise default to using the given conventional logger log function.
- * @param {function(...*)} loggerLog - the potentially wrapped underlying logger's log method (if any) or info method (if none)
- * @param {Logger|BasicLogger|undefined} logger - the logger from which the log method originated
- * @returns {function(...data)} a modified version of the given log function
+ * Generates an extended log function that will delegate the logging to the appropriate logging function based on an
+ * extracted log level prefix (if any & if its valid) and otherwise default to using the given log function.
+ * @param {Logger} target - the target object onto which logging functionality is being installed
+ * @param {function(...*)} log - the wrapped and bound underlying logger's log method
+ * @returns {function(...data)} an extended version of the given log function
  */
-function generateLogFunction(loggerLog, logger) {
+function extendLogFunction(target, log) {
   /**
-   * An extension of the conventional log method that first checks if the first argument is a valid log level and if so
-   * instead delegates the call to the appropriate logging function for the specified log level (passing any and all
-   * arguments after the first argument to it); and otherwise simply delegates the log call to the underlying logger's
-   * log method (if any) or info method (if none) passing ALL of the original arguments to it.
-   * @param {...*} data - zero or more data items to be logged - with special meaning assigned to the first argument
-   * both by this function and by the underlying logger's log method (e.g. see console.log)
+   * An extension of the conventional log method that first checks if the first argument contains a valid log level and
+   * if so instead delegates the call to the appropriate logging function for the specified log level (passing the rest
+   * of the first argument (if any) and all arguments after the first argument to it); or otherwise simply delegates the
+   * log call to the underlying logger's log method passing ALL of the original arguments to it.
+   * @param {...*} data - zero or more data items to be logged - with special meaning assigned to the first argument by
+   * this function and also possibly by the underlying logger's log method (e.g. see console.log)
    */
-  function log(data) {
+  function logAtLevel(data) {
+    const self = this || target;
     // If NO arguments were passed, then delegate a no-arg call to the given logger log function
     const len = arguments.length;
     if (len <= 0) {
-      loggerLog();
+      log();
       return;
     }
-    const logLevel = cleanLogLevel(arguments[0]);
-    let logFn = undefined;
+    const [logLevel, rest] = extractLogLevelAndRest(arguments[0]);
+
+    let args;
+    if (!logLevel) {
+      // No log level, so use all arguments passed as is
+      args = arguments;
+    } else if (rest) {
+      // First argument contained MORE than just a log level, so use the rest of the first argument as the first argument
+      args = arguments;
+      args[0] = rest;
+    } else {
+      // First argument ONLY contained a log level, so drop the first argument
+      args = new Array(len - 1);
+      for (let i = 1; i < len; ++i) {
+        args[i - 1] = arguments[i];
+      }
+    }
 
     switch (logLevel) {
       case LogLevel.ERROR:
-        logFn = this.error;
-        break;
+        self.error.apply(null, args);
+        return;
+
       case LogLevel.WARN:
-        logFn = this.warn;
-        break;
+        self.warn.apply(null, args);
+        return;
+
       case LogLevel.INFO:
-        logFn = this.info;
-        break;
+        self.info.apply(null, args);
+        return;
+
       case LogLevel.DEBUG:
-        logFn = this.debug;
-        break;
+        self.debug.apply(null, args);
+        return;
+
       case LogLevel.TRACE:
-        logFn = this.trace;
-        break;
+        self.trace.apply(null, args);
+        return;
+
+      case 'LOG':
+        log.apply(null, args); // log is already bound to its logger, so ignore thisArg
+        return;
+
       default:
         // If no valid log level was provided as a first argument then default to calling the given logger log function
         // using ALL of the arguments as data
-        loggerLog.apply(logger, arguments);
+        log.apply(null, arguments); // log is already bound to its logger, so ignore thisArg
         return;
     }
-    // Collect all arguments other than logLevel
-    const args = new Array(len - 1);
-    for (let i = 1; i < len; ++i) {
-      args[i - 1] = arguments[i];
-    }
-    logFn.apply(logger, args);
   }
 
-  return log;
+  return logAtLevel;
 }

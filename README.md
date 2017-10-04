@@ -1,4 +1,4 @@
-# logging-utils v4.0.14
+# logging-utils v4.0.16
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -123,7 +123,7 @@ process.env.MyLogLevel = LogLevel.TRACE;
 * To log errors:
 ```js
 // Log an error with a strack trace
-context.error('Error message 1', new Error('Boom').stack);
+context.error('Error message 1', new Error('Boom'));
 
 // Log an error without a stack trace
 context.error('Error message 2');
@@ -164,7 +164,7 @@ if (context.traceEnabled) context.trace('Trace message 2');
 * To log messages at a specified log level (using the `log` method):
 ```js
 // To log a message at LogLevel.TRACE (or do nothing when trace messages are disabled)
-context.log(LogLevel.ERROR, 'Error message 1', new Error('Boom').stack);
+context.log(LogLevel.ERROR, 'Error message 1', new Error('Boom'));
 
 // Note that this will also work with console, but you won't get any suppression according to log level
 console.log(LogLevel.TRACE, 'Trace message 1');
@@ -177,7 +177,7 @@ log(context, LogLevel.DEBUG, 'Debug message 1');
 
 // Note that this will also work with console (and undefined), but you won't get any suppression according to log level
 log(console, LogLevel.WARN, 'Warn message 1');
-log(undefined, LogLevel.ERROR, 'Error message 1', new Error('Boom 2').stack);
+log(undefined, LogLevel.ERROR, 'Error message 1', new Error('Boom 2'));
 ```
 
 ## Unit tests

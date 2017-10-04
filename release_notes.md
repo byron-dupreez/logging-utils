@@ -1,5 +1,15 @@
 ## Changes
 
+### 4.0.16
+- Changed all logging functions to be able to use level prefixes even when the first argument is NOT a string
+- Bound all logging functions to their logger to facilitate their use even when invoked as "detached" functions
+- Changed the extended `log` function to invoke `log.apply` using `this` (if defined) or the target to which it was 
+  added (if not) as `thisArg` to avoid errors when the extended `log` function is invoked as a "detached" function
+- Changed `log` method & function to attempt to extract a log level prefix from the first argument & when successful to 
+  then use the rest of the first argument as the first argument
+- Added zero arguments length check to `log` function to avoid errors when invoked without any arguments
+- Updated `core-functions` dependency to version 3.0.16
+
 ### 4.0.14
 - Replaced all logging of `error.stack` with logging of just the error
 - Updated `core-functions` dependency to version 3.0.15
