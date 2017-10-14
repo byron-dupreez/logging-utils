@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.17
+- Updated `core-functions` dependency to version 3.0.17
+
 ### 4.0.16
 - Changed all logging functions to be able to use level prefixes even when the first argument is NOT a string
 - Bound all logging functions to their logger to facilitate their use even when invoked as "detached" functions
