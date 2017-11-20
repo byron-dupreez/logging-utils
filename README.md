@@ -1,4 +1,4 @@
-# logging-utils v4.0.18
+# logging-utils v4.0.19
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:

@@ -1,5 +1,10 @@
 ## Changes
 
+### 4.0.19
+- Renamed dummy first exports (`exports._ = '_'; //IDE workaround`) of most modules to (`exports._$_ = '_$_';`) to avoid 
+  potential future collisions with `lodash` & `underscore`
+- Updated `core-functions` dependency to version 3.0.19
+
 ### 4.0.18
 - Updated `core-functions` dependency to version 3.0.18
 
