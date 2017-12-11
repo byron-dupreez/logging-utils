@@ -1,4 +1,4 @@
-# logging-utils v4.0.19
+# logging-utils v4.0.20
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -11,7 +11,7 @@ The log levels supported are the following:
 Main module:
 - logging.js
 
-This module is exported as a [Node.js](https://nodejs.org/) module.
+This module is exported as a [Node.js](https://nodejs.org) module.
 
 ## Installation
 
@@ -181,7 +181,7 @@ log(undefined, LogLevel.ERROR, 'Error message 1', new Error('Boom 2'));
 ```
 
 ## Unit tests
-This module's unit tests were developed with and must be run with [tape](https://www.npmjs.com/package/tape). The unit tests have been tested on [Node.js v4.3.2](https://nodejs.org/en/blog/release/v4.3.2/).  
+This module's unit tests were developed with and must be run with [tape](https://www.npmjs.com/package/tape). The unit tests have been tested on [Node.js v6.10.3](https://nodejs.org/en/blog/release/v6.10.3).  
 
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
