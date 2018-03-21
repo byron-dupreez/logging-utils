@@ -1,4 +1,4 @@
-# logging-utils v4.0.22
+# logging-utils v4.0.23
 Utilities for configuring simple log level based logging functionality on an object.
 
 The log levels supported are the following:
@@ -186,4 +186,4 @@ This module's unit tests were developed with and must be run with [tape](https:/
 See the [package source](https://github.com/byron-dupreez/logging-utils) for more details.
 
 ## Changes
-See [release_notes.md](./release_notes.md)
+See [CHANGES.md](./CHANGES.md)

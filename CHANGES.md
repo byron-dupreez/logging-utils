@@ -1,5 +1,10 @@
 ## Changes
 
+### 4.0.23
+- Added `.npmignore`
+- Renamed `release_notes.md` to `CHANGES.md`
+- Updated dependencies
+
 ### 4.0.22
 - Updated `core-functions` dependency to version 3.0.22
 
