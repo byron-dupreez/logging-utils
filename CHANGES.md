@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.24
+- Updated dependencies
+
 ### 4.0.23
 - Added `.npmignore`
 - Renamed `release_notes.md` to `CHANGES.md`
