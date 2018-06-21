@@ -1,5 +1,8 @@
 ## Changes
 
+### 4.0.25
+- Updated dependencies
+
 ### 4.0.24
 - Updated dependencies
 

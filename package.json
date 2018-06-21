@@ -1,7 +1,7 @@
 {
   "name": "logging-utils",
   "description": "Utilities for configuring simple log level based logging functionality on an object",
-  "version": "4.0.24",
+  "version": "4.0.25",
   "author": "Byron du Preez",
   "license": "Apache-2.0",
   "engines": {
@@ -13,7 +13,7 @@
   },
   "repository": "https://github.com/byron-dupreez/logging-utils",
   "dependencies": {
-    "core-functions": "3.0.24"
+    "core-functions": "3.0.25"
   },
   "devDependencies": {
     "tape": "^4.9.1"
